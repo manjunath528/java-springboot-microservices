@@ -1,0 +1,10 @@
+PUT http://localhost:4004/users/ed02317c-f56a-4c1c-995d-1e4f0a54f3e6
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "John Doe UPDATED",
+  "email": "john.doe@example.com",
+  "address": "123 main street",
+  "dateOfBirth": "1995-09-09"
+}
