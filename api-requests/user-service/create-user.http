@@ -4,10 +4,17 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-  "name": "manju",
-  "email": "manju@example.com",
-  "address": "123 main street22",
+  "name": "Maha Sharma",
+  "email": "maha.sharma@example.com",
+  "address": "123 Main Street, Apt 22",
   "dateOfBirth": "2000-09-09",
+  "weight": 60.5,
+  "height": 1.65,
+  "gender": "FEMALE",
+  "fitnessGoal": "LOSE_WEIGHT",
+  "dailyStepGoal": 10000,
+  "sleepGoalHours": 8.0,
+  "notificationsEnabled": true,
   "registeredDate": "2024-11-28"
 }
 

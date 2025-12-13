@@ -36,7 +36,6 @@ public class UserController {
     List<UserResponseDTO> users = userService.getUsers();
     return ResponseEntity.ok().body(users);
   }
-
   @PostMapping
   @Operation(summary = "Create a new User")
   public ResponseEntity<UserResponseDTO> createUser(
@@ -47,7 +46,13 @@ public class UserController {
             userRequestDTO);
     return ResponseEntity.ok().body(userResponseDTO);
   }
-
+  @GetMapping("/{id}")
+  @Operation(summary = "Get User Details by ID")
+  public ResponseEntity<UserResponseDTO> getUserDetails(@PathVariable String id) {
+    UUID uuid = UUID.fromString(id);
+    UserResponseDTO userResponseDTO = userService.getUserById(uuid);
+    return ResponseEntity.ok(userResponseDTO);
+  }
   @PutMapping("/{id}")
   @Operation(summary = "Update a new User")
   public ResponseEntity<UserResponseDTO> updateUser(@PathVariable String id,

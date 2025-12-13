@@ -1,10 +1,18 @@
-PUT http://localhost:4004/api/users/ed02317c-f56a-4c1c-995d-1e4f0a54f3e6
+PUT http://localhost:4004/api/users/42758ed1-37b3-4a9c-9538-4a8f633e8551
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-  "name": "manjunath",
-  "email": "man@example.com",
-  "address": "123 main street",
-  "dateOfBirth": "1995-09-09"
+  "name": "MahaSharma",
+  "email": "maha.sharma@example.com",
+  "address": "123 Main Street, Apt 22",
+  "dateOfBirth": "2000-09-09",
+  "weight": 60.5,
+  "height": 1.65,
+  "gender": "FEMALE",
+  "fitnessGoal": "LOSE_WEIGHT",
+  "dailyStepGoal": 10000,
+  "sleepGoalHours": 8.0,
+  "notificationsEnabled": true,
+  "registeredDate": "2024-11-28"
 }
