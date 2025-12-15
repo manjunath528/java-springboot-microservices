@@ -21,6 +21,14 @@ spring:
             - StripPrefix=1
             - JwtValidation
 
+        - id: workout-service
+          uri: http://workout-service:4006
+          predicates:
+            - Path=/api/activities/**
+          filters:
+            - StripPrefix=1
+            - JwtValidation
+
         # Route for /api/docs/patients to patient-service /v3/api-docs
         - id: api-docs-user-route
           uri: http://user-service:4000

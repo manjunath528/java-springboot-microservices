@@ -1,0 +1,12 @@
+##
+POST http://localhost:4004/api/activities
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "userId": "f228ce99-7d6b-4910-8865-de076627d406",
+  "workoutType": "YOGA",
+  "durationMinutes": 45,
+  "caloriesBurned": 400,
+  "activityDate": "2025-01-15"
+}
