@@ -14,6 +14,7 @@ import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import user.events.UserEvent;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -124,12 +125,14 @@ public class UserService {
 
   // ================== DELETE USER ==================
   public void deleteUser(UUID id) {
-    if (!userRepository.existsById(id)) {
-      throw new UserNotFoundException("User not found with ID: " + id);
-    }
+    logger.info("User details with ID: {}", id);
+    User user = userRepository.findById(id)
+            .orElseThrow(() ->
+                    new UserNotFoundException("User not found with ID: " + id)
+            );
     userRepository.deleteById(id);
     logger.info("Deleted user with ID: {}", id);
-
-    // Optional: publish USER_DELETED Kafka event
+    kafkaProducer.sendUserDeletedEvent(user);
+    logger.info("Successfully deleted user with ID={}", id);
   }
 }

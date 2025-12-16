@@ -10,6 +10,7 @@ import java.util.UUID;
 
 @Repository
 public interface ActivityRepository extends JpaRepository<Activity, UUID> {
+    void deleteByUserId(UUID userId);
     List<Activity> findByUserId(UUID userId);
 
     List<Activity> findByUserIdAndActivityDate(UUID userId, LocalDate activityDate);

@@ -22,6 +22,7 @@ public class KafkaConsumer {
       log.info("Received User Event: [UserId={},User Name={},User Email={}]",
               userEvent.getUserId(),
               userEvent.getName(),
+              userEvent.getEventType(),
               userEvent.getEmail());
     } catch (InvalidProtocolBufferException e) {
       log.error("Error deserializing event {}", e.getMessage());

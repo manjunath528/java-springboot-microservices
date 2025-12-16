@@ -31,4 +31,19 @@ public class KafkaProducer {
       log.error("Error sending UserCreated event: {}", event);
     }
   }
+  public void sendUserDeletedEvent(User user) {
+    UserEvent event = UserEvent.newBuilder()
+            .setUserId(user.getId().toString())
+            .setName(user.getName())
+            .setEmail(user.getEmail())
+            .setEventType("USER_DELETED")
+            .build();
+
+    try {
+      kafkaTemplate.send("user", event.toByteArray());
+      log.info("USER_DELETED event published for userId={}", user.getId());
+    } catch (Exception e) {
+      log.error("Failed to publish USER_DELETED event for userId={}", user.getId(), e);
+    }
+  }
 }

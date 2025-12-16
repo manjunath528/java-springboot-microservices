@@ -4,7 +4,7 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-  "userId": "f228ce99-7d6b-4910-8865-de076627d406",
+  "userId": "e84bf175-7e4a-4976-9f72-0388829ae49e",
   "workoutType": "YOGA",
   "durationMinutes": 45,
   "caloriesBurned": 400,
