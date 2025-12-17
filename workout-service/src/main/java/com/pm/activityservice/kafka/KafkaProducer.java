@@ -6,21 +6,16 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
+
 @Service
 public class KafkaProducer {
 
-    private static final Logger log =
-            LoggerFactory.getLogger(KafkaProducer.class);
-
+    private static final Logger log = LoggerFactory.getLogger(
+            KafkaProducer.class);
     private final KafkaTemplate<String, byte[]> kafkaTemplate;
-    private final String activityTopic;
 
-    public KafkaProducer(
-            KafkaTemplate<String, byte[]> kafkaTemplate,
-            @Value("${kafka.topics.activity}") String activityTopic
-    ) {
+    public KafkaProducer(KafkaTemplate<String, byte[]> kafkaTemplate) {
         this.kafkaTemplate = kafkaTemplate;
-        this.activityTopic = activityTopic;
     }
 
     public void sendActivityCreatedEvent(Activity activity) {
@@ -35,12 +30,10 @@ public class KafkaProducer {
                 .setTimestamp(System.currentTimeMillis())
                 .build();
 
-        kafkaTemplate.send(
-                activityTopic,
-                activity.getUserId().toString(),
-                event.toByteArray()
-        );
-
-        log.info("Sent ACTIVITY_CREATED event to topic={}", activityTopic);
+        try {
+            kafkaTemplate.send("activity", event.toByteArray());
+        } catch (Exception e) {
+            log.error("Error sending ActivityCreated event: {}", event);
+        }
     }
 }

@@ -41,7 +41,7 @@ public class UserService {
   // ================== GET ALL USERS ==================
   public List<UserResponseDTO> getUsers() {
     List<User> users = userRepository.findAll();
-    logger.info("Fetched {} users from database", users.size());
+    logger.info("Fetched->{} users from database", users.size());
     return users.stream()
             .map(UserMapper::toDTO)
             .toList();
@@ -71,14 +71,14 @@ public class UserService {
     // Send Kafka event
     kafkaProducer.sendEvent(newUser);
 
-    logger.info("Created new user: {}", newUser.getId());
+    logger.info("Created new user->{}", newUser.getId());
     return UserMapper.toDTO(newUser);
   }
 
   // ================== UPDATE USER ==================
   @Transactional
   public UserResponseDTO updateUser(UUID id, UserRequestDTO userRequestDTO) {
-    logger.info("Requested update for UserId: {}", id);
+    logger.info("Requested update for UserId->{}", id);
 
     Optional<User> optionalUser = userRepository.findById(id);
     User user = optionalUser.orElseThrow(
@@ -111,7 +111,7 @@ public class UserService {
     // Optional: Publish USER_UPDATED Kafka event
     kafkaProducer.sendEvent(updatedUser);
 
-    logger.info("Updated user successfully: {}", updatedUser.getId());
+    logger.info("Updated user successfully->{}", updatedUser.getId());
     return UserMapper.toDTO(updatedUser);
   }
 
@@ -119,20 +119,20 @@ public class UserService {
     User user = userRepository.findById(id)
             .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + id));
 
-    logger.info("Fetched user details for ID: {}", id);
+    logger.info("Fetched user details for ID->{}", id);
     return UserMapper.toDTO(user);
   }
 
   // ================== DELETE USER ==================
   public void deleteUser(UUID id) {
-    logger.info("User details with ID: {}", id);
+    logger.info("User details with ID->{}", id);
     User user = userRepository.findById(id)
             .orElseThrow(() ->
                     new UserNotFoundException("User not found with ID: " + id)
             );
     userRepository.deleteById(id);
-    logger.info("Deleted user with ID: {}", id);
+    logger.info("Deleted user with ID->{}", id);
     kafkaProducer.sendUserDeletedEvent(user);
-    logger.info("Successfully deleted user with ID={}", id);
+    logger.info("Successfully deleted user with ID->{}", id);
   }
 }

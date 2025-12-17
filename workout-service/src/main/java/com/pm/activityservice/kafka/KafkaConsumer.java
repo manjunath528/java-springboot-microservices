@@ -1,41 +1,39 @@
 package com.pm.activityservice.kafka;
 
+import activity.events.ActivityEvent;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pm.activityservice.repository.ActivityRepository;
+import com.pm.activityservice.service.ActivityService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import users.events.UserEvent;
-
-import java.util.UUID;
-@Service
+@Component
 public class KafkaConsumer {
 
-    private final ActivityRepository activityRepository;
-    private static final Logger log = LoggerFactory.getLogger(KafkaConsumer.class);
+    private static final Logger log = LoggerFactory.getLogger(
+            KafkaConsumer.class);
+    private final ActivityService activityService;
 
-    public KafkaConsumer(ActivityRepository activityRepository) {
-        this.activityRepository = activityRepository;
+    public KafkaConsumer(ActivityService activityService) {
+        this.activityService = activityService;
     }
 
     @KafkaListener(topics = "user", groupId = "activity-service")
-    public void consumeUserEvent(byte[] event) {
-        try {
-            UserEvent userEvent = UserEvent.parseFrom(event);
-
-            log.info("Received User Event: [UserId={}, EventType={}]",
-                    userEvent.getUserId(),
-                    userEvent.getEventType());
-
-            if ("USER_DELETED".equals(userEvent.getEventType())) {
-                UUID userId = UUID.fromString(userEvent.getUserId());
-                activityRepository.deleteByUserId(userId);
-                log.info("Deleted activities for UserId={}", userId);
+    public void consumeUserEvent(byte[] event) throws InvalidProtocolBufferException {
+        UserEvent userEvent = UserEvent.parseFrom(event);
+        log.info("Received User Delete Event[User ID: {}, Event Type: {}]",userEvent.getUserId(),userEvent.getEventType());
+        if ("USER_DELETED".equals(userEvent.getEventType())) {
+            log.info("Deleting Activity Details of User Id->{}",userEvent.getUserId());
+            try {
+                activityService.deleteActivitiesForUser(userEvent.getUserId());
+                log.info("Activity Details deleted successfully for user ->{}",userEvent.getUserId());
+            } catch (Exception e) {
+                log.error("Error deleting activity details of user -> {}",userEvent.getUserId());
             }
 
-        } catch (InvalidProtocolBufferException e) {
-            log.error("Error deserializing UserEvent: {}", e.getMessage());
         }
     }
 }

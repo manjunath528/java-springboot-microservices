@@ -1,2 +1,2 @@
-GET http://localhost:4004/api/activities/user/e84bf175-7e4a-4976-9f72-0388829ae49e
+GET http://localhost:4004/api/activities/user/6ac847c9-ceeb-4b1a-90c5-44f9da40f15f
 Authorization: Bearer {{token}}
