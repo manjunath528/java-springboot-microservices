@@ -29,6 +29,14 @@ spring:
             - StripPrefix=1
             - JwtValidation
 
+        - id: nutrition-service
+          uri: http://nutrition-service:4009
+          predicates:
+            - Path=/api/nutrition/**
+          filters:
+            - StripPrefix=1
+            - JwtValidation
+
         # Route for /api/docs/patients to patient-service /v3/api-docs
         - id: api-docs-user-route
           uri: http://user-service:4000
