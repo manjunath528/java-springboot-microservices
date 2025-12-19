@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -61,7 +62,7 @@ public class UserController {
     log.info("User created successfully -> userId->{}",
             userResponseDTO.getId());
 
-    return ResponseEntity.ok().body(userResponseDTO);
+    return ResponseEntity.status(HttpStatus.CREATED).body(userResponseDTO);
   }
 
   @GetMapping("/{id}")

@@ -17,13 +17,21 @@ public class UserIntegrationTest extends BaseIntegrationTest {
     @Test
     void shouldCreateUser() {
         String payload = """
-        {
-          "name": "aa Doe",
-          "email": "cc.doe@test.com",
-          "address": "Street 1",
-          "dateOfBirth": "1995-01-01",
-          "registeredDate": "2025-01-01"
-        }
+                          {
+                            "name": "masss",
+                            "email": "masss.sharma@example.com",
+                            "address": "123 Main Street, Apt 22",
+                            "dateOfBirth": "2000-09-09",
+                            "weight": 60.5,
+                            "height": 1.65,
+                            "gender": "FEMALE",
+                            "fitnessGoal": "LOSE_WEIGHT",
+                            "dailyStepGoal": 10000,
+                            "sleepGoalHours": 8.0,
+                            "notificationsEnabled": true,
+                            "registeredDate": "2024-11-28"
+                          }
+                
         """;
 
         given()
@@ -33,6 +41,7 @@ public class UserIntegrationTest extends BaseIntegrationTest {
                 .when()
                 .post("/api/users")
                 .then()
-                .statusCode(200);
+                .statusCode(201)  // Change after debugging if necessary
+                .log().body();
     }
 }
