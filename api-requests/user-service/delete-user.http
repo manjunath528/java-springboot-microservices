@@ -1,4 +1,4 @@
 ### Delete an entity
-DELETE http://localhost:4004/api/users/9697034b-58a1-4942-aa1d-dfa2b25e403a
+DELETE http://localhost:4004/api/users/10add762-8407-4df8-ae08-eb9617e34a26
 Authorization: Bearer {{token}}
 ###

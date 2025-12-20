@@ -14,17 +14,16 @@ import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import user.events.UserEvent;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
 public class UserService {
 
-  private static final Logger logger = LoggerFactory.getLogger(UserService.class);
+  private static final Logger logger =
+          LoggerFactory.getLogger(UserService.class);
 
   private final UserRepository userRepository;
   private final BillingServiceGrpcClient billingServiceGrpcClient;
@@ -40,8 +39,10 @@ public class UserService {
 
   // ================== GET ALL USERS ==================
   public List<UserResponseDTO> getUsers() {
+    logger.info("Fetching all users");
     List<User> users = userRepository.findAll();
-    logger.info("Fetched->{} users from database", users.size());
+    logger.info("Fetched->{} users", users.size());
+
     return users.stream()
             .map(UserMapper::toDTO)
             .toList();
@@ -49,53 +50,71 @@ public class UserService {
 
   // ================== CREATE USER ==================
   public UserResponseDTO createUser(UserRequestDTO userRequestDTO) {
+
+    logger.info("Creating user with email->{}",
+            userRequestDTO.getEmail());
+
     if (userRepository.existsByEmail(userRequestDTO.getEmail())) {
+      logger.warn("Email already exists->{}",
+              userRequestDTO.getEmail());
       throw new EmailAlreadyExistsException(
-              "A user with email " + userRequestDTO.getEmail() + " already exists");
+              "User with email " + userRequestDTO.getEmail() + " already exists"
+      );
     }
 
+    User user = UserMapper.toEntity(userRequestDTO);
+    User savedUser = userRepository.save(user);
 
-    User newUser = UserMapper.toEntity(userRequestDTO);
-    // Save user in DB
-    userRepository.save(newUser);
+    logger.info("User saved in DB with ID->{}", savedUser.getId());
 
-    newUser = userRepository.save(newUser);
-
-    // Create billing account via gRPC
+    // Create billing account
     billingServiceGrpcClient.createBillingAccount(
-            newUser.getId().toString(),
-            newUser.getName(),
-            newUser.getEmail()
+            savedUser.getId().toString(),
+            savedUser.getName(),
+            savedUser.getEmail()
     );
 
-    // Send Kafka event
-    kafkaProducer.sendEvent(newUser);
+    logger.info("Billing account created for userId->{}",
+            savedUser.getId());
 
-    logger.info("Created new user->{}", newUser.getId());
-    return UserMapper.toDTO(newUser);
+    // Publish Kafka event
+    kafkaProducer.sendEvent(savedUser);
+    logger.info("User created event published for userId->{}",
+            savedUser.getId());
+
+    return UserMapper.toDTO(savedUser);
   }
 
   // ================== UPDATE USER ==================
   @Transactional
-  public UserResponseDTO updateUser(UUID id, UserRequestDTO userRequestDTO) {
-    logger.info("Requested update for UserId->{}", id);
+  public UserResponseDTO updateUser(UUID id,
+                                    UserRequestDTO userRequestDTO) {
 
-    Optional<User> optionalUser = userRepository.findById(id);
-    User user = optionalUser.orElseThrow(
-            () -> new UserNotFoundException("User not found with ID: " + id));
+    logger.info("Updating userId->{}", id);
 
-    logger.info("User found in DB: {}", user.getId());
+    User user = userRepository.findById(id)
+            .orElseThrow(() -> {
+              logger.warn("User not found for update->{}", id);
+              return new UserNotFoundException(
+                      "User not found with ID: " + id
+              );
+            });
 
-    // Check for duplicate email
-    if (userRepository.existsByEmailAndIdNot(userRequestDTO.getEmail(), id)) {
+    if (userRepository.existsByEmailAndIdNot(
+            userRequestDTO.getEmail(), id)) {
+
+      logger.warn("Duplicate email detected during update->{}",
+              userRequestDTO.getEmail());
+
       throw new EmailAlreadyExistsException(
-              "A user with email " + userRequestDTO.getEmail() + " already exists");
+              "User with email " + userRequestDTO.getEmail() + " already exists"
+      );
     }
 
     // Update fields
     user.setName(userRequestDTO.getName());
-    user.setAddress(userRequestDTO.getAddress());
     user.setEmail(userRequestDTO.getEmail());
+    user.setAddress(userRequestDTO.getAddress());
     user.setWeight(userRequestDTO.getWeight());
     user.setHeight(userRequestDTO.getHeight());
     user.setGender(userRequestDTO.getGender());
@@ -105,34 +124,47 @@ public class UserService {
     user.setSleepGoalHours(userRequestDTO.getSleepGoalHours());
     user.setNotificationsEnabled(userRequestDTO.getNotificationsEnabled());
 
-    // Save updates
     User updatedUser = userRepository.save(user);
 
-    // Optional: Publish USER_UPDATED Kafka event
     kafkaProducer.sendEvent(updatedUser);
+    logger.info("User updated successfully->{}", updatedUser.getId());
 
-    logger.info("Updated user successfully->{}", updatedUser.getId());
     return UserMapper.toDTO(updatedUser);
   }
 
+  // ================== GET USER BY ID ==================
   public UserResponseDTO getUserById(UUID id) {
-    User user = userRepository.findById(id)
-            .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + id));
 
-    logger.info("Fetched user details for ID->{}", id);
+    logger.info("Fetching user by ID->{}", id);
+
+    User user = userRepository.findById(id)
+            .orElseThrow(() -> {
+              logger.warn("User not found->{}", id);
+              return new UserNotFoundException(
+                      "User not found with ID: " + id
+              );
+            });
+
     return UserMapper.toDTO(user);
   }
 
   // ================== DELETE USER ==================
   public void deleteUser(UUID id) {
-    logger.info("User details with ID->{}", id);
+
+    logger.info("Deleting userId->{}", id);
+
     User user = userRepository.findById(id)
-            .orElseThrow(() ->
-                    new UserNotFoundException("User not found with ID: " + id)
-            );
-    userRepository.deleteById(id);
-    logger.info("Deleted user with ID->{}", id);
+            .orElseThrow(() -> {
+              logger.warn("User not found for deletion->{}", id);
+              return new UserNotFoundException(
+                      "User not found with ID: " + id
+              );
+            });
+
+    userRepository.delete(user);
+    logger.info("User deleted from DB->{}", id);
+
     kafkaProducer.sendUserDeletedEvent(user);
-    logger.info("Successfully deleted user with ID->{}", id);
+    logger.info("User deleted event published for userId->{}", id);
   }
 }
