@@ -19,7 +19,7 @@ public class KafkaConsumer {
       ActivityEvent userEvent = ActivityEvent.parseFrom(event);
       // ... perform any business related to analytics here
 
-      log.info("Received Activity Event: [ActivityId={},UserId={},Activity Type={}]",
+      log.info("Received Activity Event: [ActivityId={},UserId={},Event Type={}, Activity Type={}]",
               userEvent.getActivityId(),
               userEvent.getUserId(),
               userEvent.getEventType(),
@@ -35,7 +35,7 @@ public class KafkaConsumer {
       UserEvent userEvent = UserEvent.parseFrom(event);
       // ... perform any business related to analytics here
 
-      log.info("Received User Event: [UserId={},User Name={},User Email={}]",
+      log.info("Received User Event: [UserId={},User Name={}, Event Type={}, User Email={}]",
               userEvent.getUserId(),
               userEvent.getName(),
               userEvent.getEventType(),
