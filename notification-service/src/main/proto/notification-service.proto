@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package notification.events;
+
+option java_multiple_files = true;
+
+message NotificationEvent {
+  string userId = 1;
+  string source = 2;        // USER, ACTIVITY, NUTRITION
+  string eventType = 3;     // CREATED, DELETED, COMPLETED
+  string message = 4;
+  int64 timestamp = 5;
+}
