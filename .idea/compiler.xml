@@ -13,6 +13,7 @@
         <module name="nutrition-service" />
         <module name="user-service" />
         <module name="integration-tests" />
+        <module name="notification-service" />
         <module name="billing-service" />
       </profile>
     </annotationProcessing>
@@ -23,6 +24,7 @@
       <module name="api-gateway" options="-parameters" />
       <module name="auth-service" options="-parameters" />
       <module name="billing-service" options="-parameters" />
+      <module name="notification-service" options="-parameters" />
       <module name="nutrition-service" options="-parameters" />
       <module name="user-service" options="-parameters" />
       <module name="workout-service" options="-parameters" />
