@@ -1,11 +1,11 @@
-### Creates a new patient entity
+### Creates a new user entity
 POST http://localhost:4004/api/users
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-  "name": "mahi",
-  "email": "mahi.sharma@example.com",
+  "name": "vvv",
+  "email": "vvv.sharma@example.com",
   "address": "123 Main Street, Apt 22",
   "dateOfBirth": "2000-09-09",
   "weight": 60.5,

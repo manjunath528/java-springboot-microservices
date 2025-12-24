@@ -24,7 +24,7 @@ public class KafkaConsumer {
     @KafkaListener(topics = "user", groupId = "activity-service")
     public void consumeUserEvent(byte[] event) throws InvalidProtocolBufferException {
         UserEvent userEvent = UserEvent.parseFrom(event);
-        log.info("Received User Delete Event[User ID: {}, Event Type: {}]",userEvent.getUserId(),userEvent.getEventType());
+        log.info("Received User Event[User ID: {}, Event Type: {}]",userEvent.getUserId(),userEvent.getEventType());
         if ("USER_DELETED".equals(userEvent.getEventType())) {
             log.info("Deleting Activity Details of User Id->{}",userEvent.getUserId());
             try {

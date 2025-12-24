@@ -1,3 +1,2 @@
-GET  http://localhost:4004/api/nutrition/user/10add762-8407-4df8-ae08-eb9617e34a26
+GET  http://localhost:4004/api/nutrition/user/6925dfa6-39a6-4af2-950f-c62452d1e80a
 Authorization: Bearer {{token}}
-1
