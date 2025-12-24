@@ -37,6 +37,14 @@ spring:
             - StripPrefix=1
             - JwtValidation
 
+        - id: notification-service
+          uri: http://notification-service:4010
+          predicates:
+            - Path=/api/notifications/**
+          filters:
+            - StripPrefix=1
+            - JwtValidation
+
         # Route for /api/docs/patients to patient-service /v3/api-docs
         - id: api-docs-user-route
           uri: http://user-service:4000
