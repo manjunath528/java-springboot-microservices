@@ -1,2 +1,2 @@
-GET  http://localhost:4004/api/notifications/user/3f78f548-fdc0-495a-b3b9-84e31dd4d84c
+GET  http://localhost:4004/api/notifications/user/9d5df03c-d29c-4f96-8ea5-66c3e3ab12d6
 Authorization: Bearer {{token}}

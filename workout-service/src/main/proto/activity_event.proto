@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package activity.events;
+
+option java_multiple_files = true;
+
+message ActivityEvent {
+
+  enum EventType {
+    ACTIVITY_CREATED = 0;
+    ACTIVITY_UPDATED = 1;
+    ACTIVITY_COMPLETED = 2;
+  }
+
+  string activityId = 1;
+  string userId = 2;
+  string activityType = 3; // RUNNING, WALKING, CYCLING
+  int32 durationMinutes = 4;
+  int32 caloriesBurned = 5;
+  EventType eventType = 6;
+  int64 timestamp = 7;
+}

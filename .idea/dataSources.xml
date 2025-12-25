@@ -49,7 +49,7 @@
       </jdbc-additional-properties>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
-    <data-source source="LOCAL" name="notification-service-db" uuid="0b6fa293-1fa6-4b5b-a768-0a63c637ee0d">
+    <data-source source="LOCAL" name="notification-service-db" uuid="4b344903-093e-412c-a64d-a5fc65789d31">
       <driver-ref>postgresql</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
