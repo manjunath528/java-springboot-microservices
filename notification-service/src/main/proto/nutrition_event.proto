@@ -1,0 +1,21 @@
+syntax = "proto3";
+package nutrition.events;
+option java_multiple_files = true;
+
+// NutritionEvent message
+message NutritionEvent {
+  enum EventType {
+    NUTRITION_CREATED = 0;
+    NUTRITION_UPDATED = 1;
+    NUTRITION_COMPLETED = 2;
+  }
+  string id = 1;          // Nutrition record ID (UUID as string)
+  string userId = 2;      // Associated User ID
+  string mealType = 3;    // Meal type (Breakfast, Lunch, etc.)
+  int32 calories = 4;     // Calories
+  int32 protein = 5;      // Protein in grams
+  int32 carbs = 6;        // Carbs in grams
+  int32 fat = 7;          // Fat in grams
+  int64 date = 8;        // Nutrition record date (yyyy-MM-dd)
+  EventType eventType = 9;   // Event type: NUTRITION_CREATED / NUTRITION_DELETED
+}
