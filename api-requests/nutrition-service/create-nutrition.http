@@ -3,7 +3,7 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-  "userId": "10add762-8407-4df8-ae08-eb9617e34a26",
+  "userId": "60539f8d-0fa5-4880-95f2-d58c9e6ad2ba",
   "mealType": "BREAKFAST",
   "calories": 450,
   "protein": 30,

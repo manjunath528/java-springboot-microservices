@@ -1,5 +1,4 @@
 package com.pm.notificationservice.kafka;
-
 import activity.events.ActivityEvent;
 import com.pm.notificationservice.model.NotificationType;
 import com.pm.notificationservice.service.NotificationService;
