@@ -1,20 +1,24 @@
+# ---------- Build Stage ----------
 FROM maven:3.9.9-eclipse-temurin-21 AS builder
 
 WORKDIR /app
 
+# Cache dependencies
 COPY pom.xml .
 RUN mvn dependency:go-offline -B
 
+# Build application
 COPY src ./src
-RUN mvn -DskipTests clean package
+RUN mvn clean package -DskipTests
 
-FROM eclipse-temurin:21-jdk AS runner
+
+# ---------- Runtime Stage ----------
+FROM eclipse-temurin:21-jre-alpine AS runner
 
 WORKDIR /app
 
-COPY --from=builder /app/target/*.jar ./app.jar
+COPY --from=builder /app/target/*.jar app.jar
 
-EXPOSE 4001
-EXPOSE 9001
+EXPOSE 4001 9001
 
 ENTRYPOINT ["java", "-jar", "app.jar"]
