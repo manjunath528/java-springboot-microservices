@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: analytics-service
+  namespace: microservices
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: analytics-service
+  template:
+    metadata:
+      labels:
+        app: analytics-service
+    spec:
+      containers:
+        - name: analytics-service
+          image: bmanjunath1928/analytics-service:1.0.0
+          ports:
+            - containerPort: 4002   # REST API port
+          env:
+            - name: SPRING_KAFKA_BOOTSTRAP_SERVERS
+              value: kafka:9092
+            - name: SPRING_SQL_INIT_MODE
+              value: always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: analytics-service
+  namespace: microservices
+spec:
+  selector:
+    app: analytics-service
+  ports:
+    - name: http
+      protocol: TCP
+      port: 4002
+      targetPort: 4002
+  type: ClusterIP
