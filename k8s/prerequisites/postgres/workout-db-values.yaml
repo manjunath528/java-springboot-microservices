@@ -1,0 +1,9 @@
+auth:
+  username: admin_user
+  password: password
+  database: db
+
+primary:
+  persistence:
+    enabled: true
+    size: 5Gi

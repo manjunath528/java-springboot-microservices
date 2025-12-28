@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-service
+  namespace: microservices
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: user-service
+  template:
+    metadata:
+      labels:
+        app: user-service
+    spec:
+      containers:
+        - name: user-service
+          image: bmanjunath1928/user-service:1.0.0
+          ports:
+            - containerPort: 4000
+          env:
+            - name: BILLING_SERVICE_ADDRESS
+              value: billing-service
+            - name: BILLING_SERVICE_GRPC_PORT
+              value: "9001"
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: password
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:postgresql://user-service-db-postgresql:5432/db
+            - name: SPRING_DATASOURCE_USERNAME
+              value: admin_user
+            - name: SPRING_JPA_HIBERNATE_DDL_AUTO
+              value: update
+            - name: SPRING_KAFKA_BOOTSTRAP_SERVERS
+              value: kafka:9092
+            - name: SPRING_SQL_INIT_MODE
+              value: always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: user-service
+  namespace: microservices
+spec:
+  selector:
+    app: user-service
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 4000
+  type: ClusterIP

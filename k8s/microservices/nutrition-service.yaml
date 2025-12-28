@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nutrition-service
+  namespace: microservices
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nutrition-service
+  template:
+    metadata:
+      labels:
+        app: nutrition-service
+    spec:
+      containers:
+        - name: nutrition-service
+          image: bmanjunath1928/nutrition-service:1.0.0
+          ports:
+            - containerPort: 4009   # REST API port
+          env:
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: password
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:postgresql://nutrition-service-db-postgresql:5432/db
+            - name: SPRING_DATASOURCE_USERNAME
+              value: admin_user
+            - name: SPRING_JPA_HIBERNATE_DDL_AUTO
+              value: update
+            - name: SPRING_KAFKA_BOOTSTRAP_SERVERS
+              value: kafka:9092
+            - name: SPRING_SQL_INIT_MODE
+              value: always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nutrition-service
+  namespace: microservices
+spec:
+  selector:
+    app: nutrition-service
+  ports:
+    - name: http
+      protocol: TCP
+      port: 4009
+      targetPort: 4009
+  type: ClusterIP
