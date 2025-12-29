@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: user-service
-          image: bmanjunath1928/user-service:1.0.0
+          image: bmanjunath1928/user-service:latest
           ports:
             - containerPort: 4000
           env:
