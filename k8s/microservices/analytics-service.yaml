@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: analytics-service
-          image: bmanjunath1928/analytics-service:1.0.0
+          image: bmanjunath1928/analytics-service:latest
           ports:
             - containerPort: 4002   # REST API port
           env:
