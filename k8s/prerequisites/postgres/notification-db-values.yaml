@@ -1,7 +1,10 @@
 auth:
-  username: admin_user
-  password: password
-  database: db
+  existingSecret: db-secret
+  secretKeys:
+    adminPasswordKey: password
+    userPasswordKey: password
+    usernameKey: username
+    databaseKey: database
 
 primary:
   persistence:
