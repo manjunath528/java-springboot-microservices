@@ -1,1 +1,3 @@
 .idea/
+# Kubernetes secrets
+k8s/prerequisites/db-secret.yaml
