@@ -1,0 +1,20 @@
+version: '3.9'
+
+services:
+  api-gateway:
+    image: bmanjunath1928/api-gateway:latest
+    ports:
+      - "4004:4004"
+    depends_on:
+      - auth-service
+      - user-service
+
+  auth-service:
+    image: bmanjunath1928/auth-service:latest
+    ports:
+      - "4005:4005"
+
+  user-service:
+    image: bmanjunath1928/user-service:latest
+    ports:
+      - "4000:4000"
