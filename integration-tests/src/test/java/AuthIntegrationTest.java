@@ -9,9 +9,11 @@ import org.junit.jupiter.api.Test;
 public class AuthIntegrationTest {
 
   @BeforeAll
-  static void setUp(){
-    RestAssured.baseURI = "http://localhost:4004";
+  static void setUp() {
+    RestAssured.baseURI = System.getenv()
+            .getOrDefault("API_GATEWAY_URL", "http://localhost:4004");
   }
+
 
   @Test
   public void shouldReturnOKWithValidToken() {

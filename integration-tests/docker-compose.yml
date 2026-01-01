@@ -1,86 +1,113 @@
 version: "3.9"
 
+networks:
+  internal:
+    driver: bridge
+
+volumes:
+  auth-db-data:
+  user-db-data:
+  nutrition-db-data:
+  notification-db-data:
+  workout-db-data:
+  billing-db-data:
+
 services:
-  # =========================
-  # Zookeeper
-  # =========================
+  # --------------------
+  # Zookeeper & Kafka
+  # --------------------
   zookeeper:
     image: confluentinc/cp-zookeeper:7.6.0
     container_name: zookeeper
-    ports:
-      - "2181:2181"
+    networks: [internal]
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
 
-  # =========================
-  # Kafka
-  # =========================
   kafka:
     image: confluentinc/cp-kafka:7.6.0
     container_name: kafka
+    networks: [internal]
     depends_on:
       - zookeeper
-    ports:
-      - "9092:9092"
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
-      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
 
-  # =========================
+  # --------------------
   # Databases
-  # =========================
+  # --------------------
   auth-service-db:
-    image: postgres:16
+    image: postgres:15
+    networks: [internal]
     environment:
       POSTGRES_DB: db
       POSTGRES_USER: admin_user
       POSTGRES_PASSWORD: password
+    volumes:
+      - auth-db-data:/var/lib/postgresql/data
 
   user-service-db:
-    image: postgres:16
+    image: postgres:15
+    networks: [internal]
     environment:
       POSTGRES_DB: db
       POSTGRES_USER: admin_user
       POSTGRES_PASSWORD: password
+    volumes:
+      - user-db-data:/var/lib/postgresql/data
 
   nutrition-service-db:
-    image: postgres:16
+    image: postgres:15
+    networks: [internal]
     environment:
       POSTGRES_DB: db
       POSTGRES_USER: admin_user
       POSTGRES_PASSWORD: password
+    volumes:
+      - nutrition-db-data:/var/lib/postgresql/data
 
   notification-service-db:
-    image: postgres:16
+    image: postgres:15
+    networks: [internal]
     environment:
       POSTGRES_DB: db
       POSTGRES_USER: admin_user
       POSTGRES_PASSWORD: password
+    volumes:
+      - notification-db-data:/var/lib/postgresql/data
 
   workout-service-db:
-    image: postgres:16
+    image: postgres:15
+    networks: [internal]
     environment:
       POSTGRES_DB: db
       POSTGRES_USER: admin_user
       POSTGRES_PASSWORD: password
+    volumes:
+      - workout-db-data:/var/lib/postgresql/data
 
   billing-service-db:
-    image: postgres:16
+    image: postgres:15
+    networks: [internal]
     environment:
       POSTGRES_DB: db
       POSTGRES_USER: admin_user
       POSTGRES_PASSWORD: password
+    volumes:
+      - billing-db-data:/var/lib/postgresql/data
 
-  # =========================
+  # --------------------
   # Core Services
-  # =========================
+  # --------------------
   auth-service:
-    image: bmanjunath1928/auth-service:latest
+    image: bmanjunath1928/auth-service:1.0.0
+    container_name: auth-service
+    networks: [internal]
     ports:
       - "4005:4005"
     depends_on:
@@ -91,72 +118,16 @@ services:
       SPRING_DATASOURCE_PASSWORD: password
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
       SPRING_SQL_INIT_MODE: always
-      JWT_SECRET: test-secret
-
-  user-service:
-    image: bmanjunath1928/user-service:latest
-    ports:
-      - "4000:4000"
-    depends_on:
-      - user-service-db
-      - billing-service
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://user-service-db:5432/db
-      SPRING_DATASOURCE_USERNAME: admin_user
-      SPRING_DATASOURCE_PASSWORD: password
-      SPRING_JPA_HIBERNATE_DDL_AUTO: update
-      SPRING_SQL_INIT_MODE: always
-      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-      BILLING_SERVICE_ADDRESS: billing-service
-      BILLING_SERVICE_GRPC_PORT: 9001
-
-  nutrition-service:
-    image: bmanjunath1928/nutrition-service:latest
-    ports:
-      - "4009:4009"
-    depends_on:
-      - nutrition-service-db
-      - kafka
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://nutrition-service-db:5432/db
-      SPRING_DATASOURCE_USERNAME: admin_user
-      SPRING_DATASOURCE_PASSWORD: password
-      SPRING_JPA_HIBERNATE_DDL_AUTO: update
-      SPRING_SQL_INIT_MODE: always
-      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-
-  notification-service:
-    image: bmanjunath1928/notification-service:latest
-    ports:
-      - "4010:4010"
-    depends_on:
-      - notification-service-db
-      - kafka
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://notification-service-db:5432/db
-      SPRING_DATASOURCE_USERNAME: admin_user
-      SPRING_DATASOURCE_PASSWORD: password
-      SPRING_JPA_HIBERNATE_DDL_AUTO: update
-      SPRING_SQL_INIT_MODE: always
-      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-
-  workout-service:
-    image: bmanjunath1928/workout-service:latest
-    ports:
-      - "4006:4006"
-    depends_on:
-      - workout-service-db
-      - kafka
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://workout-service-db:5432/db
-      SPRING_DATASOURCE_USERNAME: admin_user
-      SPRING_DATASOURCE_PASSWORD: password
-      SPRING_JPA_HIBERNATE_DDL_AUTO: update
-      SPRING_SQL_INIT_MODE: always
-      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      JWT_SECRET: lA93KpGHGfs92kSiD8JvUeF7lK7Jt4uQmQ4Q5u9pFvQ=
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4005/actuator/health"]
+      interval: 10s
+      retries: 10
 
   billing-service:
-    image: bmanjunath1928/billing-service:latest
+    image: bmanjunath1928/billing-service:1.0.0
+    container_name: billing-service
+    networks: [internal]
     ports:
       - "4001:4001"
       - "9001:9001"
@@ -169,16 +140,77 @@ services:
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
       SPRING_SQL_INIT_MODE: always
 
-  # =========================
-  # API Gateway
-  # =========================
+  user-service:
+    image: bmanjunath1928/user-service:1.0.0
+    container_name: user-service
+    networks: [internal]
+    depends_on:
+      - user-service-db
+      - billing-service
+      - kafka
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://user-service-db:5432/db
+      SPRING_DATASOURCE_USERNAME: admin_user
+      SPRING_DATASOURCE_PASSWORD: password
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_SQL_INIT_MODE: always
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      BILLING_SERVICE_ADDRESS: billing-service
+      BILLING_SERVICE_GRPC_PORT: 9001
+
+  workout-service:
+    image: bmanjunath1928/workout-service:1.0.0
+    container_name: workout-service
+    networks: [internal]
+    depends_on:
+      - workout-service-db
+      - kafka
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://workout-service-db:5432/db
+      SPRING_DATASOURCE_USERNAME: admin_user
+      SPRING_DATASOURCE_PASSWORD: password
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_SQL_INIT_MODE: always
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+
+  nutrition-service:
+    image: bmanjunath1928/nutrition-service:1.0.0
+    container_name: nutrition-service
+    networks: [internal]
+    depends_on:
+      - nutrition-service-db
+      - kafka
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://nutrition-service-db:5432/db
+      SPRING_DATASOURCE_USERNAME: admin_user
+      SPRING_DATASOURCE_PASSWORD: password
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_SQL_INIT_MODE: always
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+
+  notification-service:
+    image: bmanjunath1928/notification-service:1.0.0
+    container_name: notification-service
+    networks: [internal]
+    depends_on:
+      - notification-service-db
+      - kafka
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://notification-service-db:5432/db
+      SPRING_DATASOURCE_USERNAME: admin_user
+      SPRING_DATASOURCE_PASSWORD: password
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_SQL_INIT_MODE: always
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+
   api-gateway:
-    image: bmanjunath1928/api-gateway:latest
+    image: bmanjunath1928/api-gateway:1.0.0
+    container_name: api-gateway
+    networks: [internal]
     ports:
       - "4004:4004"
     depends_on:
-      - auth-service
-      - user-service
-      - nutrition-service
-      - notification-service
-      - workout-service
+      auth-service:
+        condition: service_healthy
+    environment:
+      AUTH_SERVICE_URL: http://auth-service:4005
