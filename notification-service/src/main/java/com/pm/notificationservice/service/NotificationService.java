@@ -38,6 +38,7 @@ public class NotificationService {
 
     public List<Notification> getUserNotifications(String userId) {
         UUID userIdUUID = UUID.fromString(userId);
+        log.info("Fetching Notification details for ->{}", userId);
         return notificationRepository.findByUserId(userIdUUID);
     }
 }
