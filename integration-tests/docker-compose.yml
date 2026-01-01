@@ -1,17 +1,45 @@
 version: "3.9"
 
 services:
-  # ------------------------
+  # =========================
+  # Zookeeper
+  # =========================
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.6.0
+    container_name: zookeeper
+    ports:
+      - "2181:2181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+
+  # =========================
+  # Kafka
+  # =========================
+  kafka:
+    image: confluentinc/cp-kafka:7.6.0
+    container_name: kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+  # =========================
   # Databases
-  # ------------------------
+  # =========================
   auth-service-db:
     image: postgres:16
     environment:
       POSTGRES_DB: db
       POSTGRES_USER: admin_user
       POSTGRES_PASSWORD: password
-    ports:
-      - "5433:5432"
 
   user-service-db:
     image: postgres:16
@@ -19,8 +47,6 @@ services:
       POSTGRES_DB: db
       POSTGRES_USER: admin_user
       POSTGRES_PASSWORD: password
-    ports:
-      - "5434:5432"
 
   nutrition-service-db:
     image: postgres:16
@@ -28,8 +54,6 @@ services:
       POSTGRES_DB: db
       POSTGRES_USER: admin_user
       POSTGRES_PASSWORD: password
-    ports:
-      - "5435:5432"
 
   notification-service-db:
     image: postgres:16
@@ -37,8 +61,6 @@ services:
       POSTGRES_DB: db
       POSTGRES_USER: admin_user
       POSTGRES_PASSWORD: password
-    ports:
-      - "5436:5432"
 
   workout-service-db:
     image: postgres:16
@@ -46,8 +68,6 @@ services:
       POSTGRES_DB: db
       POSTGRES_USER: admin_user
       POSTGRES_PASSWORD: password
-    ports:
-      - "5437:5432"
 
   billing-service-db:
     image: postgres:16
@@ -55,75 +75,30 @@ services:
       POSTGRES_DB: db
       POSTGRES_USER: admin_user
       POSTGRES_PASSWORD: password
-    ports:
-      - "5438:5432"
 
-  # ------------------------
-  # Kafka & Zookeeper
-  # ------------------------
-  zookeeper:
-    image: confluentinc/cp-zookeeper:7.6.0
-    ports:
-      - "2181:2181"
-    environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-      ZOOKEEPER_TICK_TIME: 2000
-
-  kafka:
-    image: confluentinc/cp-kafka:7.6.0
-    depends_on:
-      - zookeeper
-    ports:
-      - "9092:9092"
-      - "9094:9094"
-    environment:
-      KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,EXTERNAL://localhost:9094
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,EXTERNAL:PLAINTEXT
-      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-
-  # ------------------------
+  # =========================
   # Core Services
-  # ------------------------
+  # =========================
   auth-service:
-    image: bmanjunath1928/auth-service:1.0.0
+    image: bmanjunath1928/auth-service:latest
     ports:
       - "4005:4005"
     depends_on:
       - auth-service-db
-      - kafka
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://auth-service-db:5432/db
       SPRING_DATASOURCE_USERNAME: admin_user
       SPRING_DATASOURCE_PASSWORD: password
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
       SPRING_SQL_INIT_MODE: always
-      JWT_SECRET: lA93KpGHGfs92kSiD8JvUeF7lK7Jt4uQmQ4Q5u9pFvQ=
-
-  billing-service:
-    image: bmanjunath1928/billing-service:1.0.0
-    ports:
-      - "4001:4001"
-      - "9001:9001"
-    depends_on:
-      - billing-service-db
-      - kafka
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://billing-service-db:5432/db
-      SPRING_DATASOURCE_USERNAME: admin_user
-      SPRING_DATASOURCE_PASSWORD: password
-      SPRING_JPA_HIBERNATE_DDL_AUTO: update
-      SPRING_SQL_INIT_MODE: always
+      JWT_SECRET: test-secret
 
   user-service:
-    image: bmanjunath1928/user-service:1.0.0
+    image: bmanjunath1928/user-service:latest
     ports:
       - "4000:4000"
     depends_on:
       - user-service-db
-      - kafka
       - billing-service
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://user-service-db:5432/db
@@ -136,7 +111,7 @@ services:
       BILLING_SERVICE_GRPC_PORT: 9001
 
   nutrition-service:
-    image: bmanjunath1928/nutrition-service:1.0.0
+    image: bmanjunath1928/nutrition-service:latest
     ports:
       - "4009:4009"
     depends_on:
@@ -151,7 +126,7 @@ services:
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
 
   notification-service:
-    image: bmanjunath1928/notification-service:1.0.0
+    image: bmanjunath1928/notification-service:latest
     ports:
       - "4010:4010"
     depends_on:
@@ -166,7 +141,7 @@ services:
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
 
   workout-service:
-    image: bmanjunath1928/workout-service:1.0.0
+    image: bmanjunath1928/workout-service:latest
     ports:
       - "4006:4006"
     depends_on:
@@ -180,8 +155,25 @@ services:
       SPRING_SQL_INIT_MODE: always
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
 
+  billing-service:
+    image: bmanjunath1928/billing-service:latest
+    ports:
+      - "4001:4001"
+      - "9001:9001"
+    depends_on:
+      - billing-service-db
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://billing-service-db:5432/db
+      SPRING_DATASOURCE_USERNAME: admin_user
+      SPRING_DATASOURCE_PASSWORD: password
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_SQL_INIT_MODE: always
+
+  # =========================
+  # API Gateway
+  # =========================
   api-gateway:
-    image: bmanjunath1928/api-gateway:1.0.0
+    image: bmanjunath1928/api-gateway:latest
     ports:
       - "4004:4004"
     depends_on:
@@ -190,9 +182,3 @@ services:
       - nutrition-service
       - notification-service
       - workout-service
-    environment:
-      AUTH_SERVICE_URL: http://auth-service:4005
-      USER_SERVICE_URL: http://user-service:4000
-      NUTRITION_SERVICE_URL: http://nutrition-service:4009
-      NOTIFICATION_SERVICE_URL: http://notification-service:4010
-      WORKOUT_SERVICE_URL: http://workout-service:4006
