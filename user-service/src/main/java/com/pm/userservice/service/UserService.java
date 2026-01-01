@@ -151,7 +151,7 @@ public class UserService {
   // ================== DELETE USER ==================
   public void deleteUser(UUID id) {
 
-    logger.info("Deleting userId->{}", id);
+    logger.info("Deleting User Details for userId->{}", id);
 
     User user = userRepository.findById(id)
             .orElseThrow(() -> {
