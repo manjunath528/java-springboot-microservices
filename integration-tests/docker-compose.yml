@@ -1,3 +1,5 @@
+version: "3.9"
+
 services:
   # =========================
   # Zookeeper & Kafka
@@ -5,18 +7,20 @@ services:
   zookeeper:
     image: confluentinc/cp-zookeeper:7.6.0
     container_name: zookeeper
+    platform: linux/amd64
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
     healthcheck:
-      test: ["CMD", "bash", "-c", "echo ruok | nc localhost 2181 | grep imok"]
+      test: ["CMD", "echo ruok | nc localhost 2181"]
       interval: 10s
-      timeout: 5s
       retries: 10
+      start_period: 10s
 
   kafka:
     image: confluentinc/cp-kafka:7.6.0
     container_name: kafka
+    platform: linux/amd64
     depends_on:
       zookeeper:
         condition: service_healthy
@@ -30,10 +34,10 @@ services:
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
     healthcheck:
-      test: ["CMD", "bash", "-c", "nc -z kafka 9092"]
+      test: ["CMD", "nc -z localhost 9092"]
       interval: 10s
-      timeout: 5s
       retries: 10
+      start_period: 10s
 
   # =========================
   # Databases
@@ -41,80 +45,86 @@ services:
   auth-db:
     image: postgres:16
     container_name: auth-db
+    platform: linux/amd64
     environment:
       POSTGRES_DB: db
       POSTGRES_USER: admin_user
       POSTGRES_PASSWORD: password
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U admin_user"]
-      interval: 5s
-      timeout: 5s
+      test: ["CMD", "pg_isready -U admin_user"]
+      interval: 10s
       retries: 10
+      start_period: 10s
 
   user-db:
     image: postgres:16
     container_name: user-db
+    platform: linux/amd64
     environment:
       POSTGRES_DB: db
       POSTGRES_USER: admin_user
       POSTGRES_PASSWORD: password
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U admin_user"]
-      interval: 5s
-      timeout: 5s
+      test: ["CMD", "pg_isready -U admin_user"]
+      interval: 10s
       retries: 10
+      start_period: 10s
 
   nutrition-db:
     image: postgres:16
     container_name: nutrition-db
+    platform: linux/amd64
     environment:
       POSTGRES_DB: db
       POSTGRES_USER: admin_user
       POSTGRES_PASSWORD: password
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U admin_user"]
-      interval: 5s
-      timeout: 5s
+      test: ["CMD", "pg_isready -U admin_user"]
+      interval: 10s
       retries: 10
+      start_period: 10s
 
   notification-db:
     image: postgres:16
     container_name: notification-db
+    platform: linux/amd64
     environment:
       POSTGRES_DB: db
       POSTGRES_USER: admin_user
       POSTGRES_PASSWORD: password
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U admin_user"]
-      interval: 5s
-      timeout: 5s
+      test: ["CMD", "pg_isready -U admin_user"]
+      interval: 10s
       retries: 10
+      start_period: 10s
 
   workout-db:
     image: postgres:16
     container_name: workout-db
+    platform: linux/amd64
     environment:
       POSTGRES_DB: db
       POSTGRES_USER: admin_user
       POSTGRES_PASSWORD: password
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U admin_user"]
-      interval: 5s
-      timeout: 5s
+      test: ["CMD", "pg_isready -U admin_user"]
+      interval: 10s
       retries: 10
+      start_period: 10s
 
   billing-db:
     image: postgres:16
     container_name: billing-db
+    platform: linux/amd64
     environment:
       POSTGRES_DB: db
       POSTGRES_USER: admin_user
       POSTGRES_PASSWORD: password
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U admin_user"]
-      interval: 5s
-      timeout: 5s
+      test: ["CMD", "pg_isready -U admin_user"]
+      interval: 10s
       retries: 10
+      start_period: 10s
 
   # =========================
   # Core Services
@@ -122,6 +132,7 @@ services:
   auth-service:
     image: bmanjunath1928/auth-service:1.0.0
     container_name: auth-service
+    platform: linux/amd64
     depends_on:
       auth-db:
         condition: service_healthy
@@ -131,17 +142,14 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://auth-db:5432/db
       SPRING_DATASOURCE_USERNAME: admin_user
       SPRING_DATASOURCE_PASSWORD: password
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
       SPRING_SQL_INIT_MODE: always
       JWT_SECRET: lA93KpGHGfs92kSiD8JvUeF7lK7Jt4uQmQ4Q5u9pFvQ=
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:4005/actuator/health"]
-      interval: 10s
-      timeout: 5s
-      retries: 15
 
   billing-service:
     image: bmanjunath1928/billing-service:1.0.0
     container_name: billing-service
+    platform: linux/amd64
     depends_on:
       billing-db:
         condition: service_healthy
@@ -152,20 +160,17 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://billing-db:5432/db
       SPRING_DATASOURCE_USERNAME: admin_user
       SPRING_DATASOURCE_PASSWORD: password
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:4001/actuator/health"]
-      interval: 10s
-      timeout: 5s
-      retries: 15
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
 
   user-service:
     image: bmanjunath1928/user-service:1.0.0
     container_name: user-service
+    platform: linux/amd64
     depends_on:
       user-db:
         condition: service_healthy
       billing-service:
-        condition: service_healthy
+        condition: service_started
       kafka:
         condition: service_healthy
     ports:
@@ -174,18 +179,15 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://user-db:5432/db
       SPRING_DATASOURCE_USERNAME: admin_user
       SPRING_DATASOURCE_PASSWORD: password
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       BILLING_SERVICE_ADDRESS: billing-service
       BILLING_SERVICE_GRPC_PORT: 9001
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:4000/actuator/health"]
-      interval: 10s
-      timeout: 5s
-      retries: 15
 
   workout-service:
     image: bmanjunath1928/workout-service:1.0.0
     container_name: workout-service
+    platform: linux/amd64
     depends_on:
       workout-db:
         condition: service_healthy
@@ -197,16 +199,13 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://workout-db:5432/db
       SPRING_DATASOURCE_USERNAME: admin_user
       SPRING_DATASOURCE_PASSWORD: password
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:4006/actuator/health"]
-      interval: 10s
-      timeout: 5s
-      retries: 15
 
   nutrition-service:
     image: bmanjunath1928/nutrition-service:1.0.0
     container_name: nutrition-service
+    platform: linux/amd64
     depends_on:
       nutrition-db:
         condition: service_healthy
@@ -218,16 +217,13 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://nutrition-db:5432/db
       SPRING_DATASOURCE_USERNAME: admin_user
       SPRING_DATASOURCE_PASSWORD: password
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:4009/actuator/health"]
-      interval: 10s
-      timeout: 5s
-      retries: 15
 
   notification-service:
     image: bmanjunath1928/notification-service:1.0.0
     container_name: notification-service
+    platform: linux/amd64
     depends_on:
       notification-db:
         condition: service_healthy
@@ -239,12 +235,8 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://notification-db:5432/db
       SPRING_DATASOURCE_USERNAME: admin_user
       SPRING_DATASOURCE_PASSWORD: password
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:4010/actuator/health"]
-      interval: 10s
-      timeout: 5s
-      retries: 15
 
   # =========================
   # API Gateway
@@ -252,23 +244,19 @@ services:
   api-gateway:
     image: bmanjunath1928/api-gateway:1.0.0
     container_name: api-gateway
+    platform: linux/amd64
     depends_on:
       auth-service:
-        condition: service_healthy
+        condition: service_started
       user-service:
-        condition: service_healthy
+        condition: service_started
       workout-service:
-        condition: service_healthy
+        condition: service_started
       nutrition-service:
-        condition: service_healthy
+        condition: service_started
       notification-service:
-        condition: service_healthy
+        condition: service_started
     ports:
       - "4004:4004"
     environment:
       AUTH_SERVICE_URL: http://auth-service:4005
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:4004/actuator/health"]
-      interval: 10s
-      timeout: 5s
-      retries: 20
