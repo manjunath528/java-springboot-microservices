@@ -1,0 +1,53 @@
+name: pr-ci.yml
+
+on:
+  pull_request:
+    branches:
+      - main
+
+concurrency:
+  group: pr-ci-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  integration-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Start integration stack
+        run: docker compose -f integration-tests/docker-compose.yml up -d
+
+      - name: Wait for API Gateway
+        run: |
+          for i in {1..60}; do
+            if curl -sf http://localhost:4004/actuator/health; then
+              echo "API Gateway is up"
+              exit 0
+            fi
+            echo "Waiting for API Gateway..."
+            sleep 5
+          done
+          echo "API Gateway failed to start"
+          docker compose -f integration-tests/docker-compose.yml logs
+          exit 1
+
+      - name: Run integration tests
+        run: mvn test -pl integration-tests -am
+
+      - name: Dump container logs on failure
+        if: failure()
+        run: docker compose -f integration-tests/docker-compose.yml logs
+
+      - name: Stop containers
+        if: always()
+        run: docker compose -f integration-tests/docker-compose.yml down -v
