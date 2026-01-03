@@ -9,9 +9,8 @@ public abstract class BaseIntegrationTest {
 
     @BeforeAll
     static void authenticate() {
-        // Use environment variable if set, fallback to localhost
-        String baseUrl = System.getenv().getOrDefault("API_GATEWAY_URL", "http://localhost:4004");
-        RestAssured.baseURI = baseUrl;
+        RestAssured.baseURI =
+                System.getenv().getOrDefault("API_GATEWAY_URL", "http://localhost:4004");
 
         String loginPayload = """
         {

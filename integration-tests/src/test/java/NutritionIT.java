@@ -6,10 +6,10 @@ import java.util.UUID;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.*;
 
-public class NutritionIntegrationTest extends BaseIntegrationTest {
+public class NutritionIT extends BaseIntegrationTest {
 
     @Test
-    void shouldCreateNutrition() {
+    void shouldCreateNutritionEntry() {
         String payload = """
         {
           "userId": "%s",
@@ -35,7 +35,7 @@ public class NutritionIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    void shouldGetUserNutrition() {
+    void shouldReturnNutritionForUser() {
         UUID userId = UUID.randomUUID();
 
         given()

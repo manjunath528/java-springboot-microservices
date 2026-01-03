@@ -1,27 +1,27 @@
 import org.junit.jupiter.api.Test;
 
-import java.time.LocalDate;
 import java.util.UUID;
-import static io.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.*;
 
-public class ActivityIntegrationTest extends BaseIntegrationTest{
+import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.instanceOf;
+
+public class ActivityIT extends BaseIntegrationTest {
 
     @Test
     void shouldCreateActivity() {
         String payload = """
         {
-          "userId": "11111111-1111-1111-1111-111111111111",
+          "userId": "%s",
           "workoutType": "RUNNING",
           "durationMinutes": 30,
           "caloriesBurned": 300,
           "activityDate": "2025-01-01",
           "status": "COMPLETED"
         }
-        """;
+        """.formatted(UUID.randomUUID());
 
         given()
-                .header("Authorization", "Bearer " + token)   // 🔴 REQUIRED
+                .header("Authorization", "Bearer " + token)
                 .contentType("application/json")
                 .body(payload)
                 .when()
@@ -29,9 +29,11 @@ public class ActivityIntegrationTest extends BaseIntegrationTest{
                 .then()
                 .statusCode(201);
     }
+
     @Test
-    void shouldGetUserActivities(){
+    void shouldGetUserActivities() {
         UUID userId = UUID.randomUUID();
+
         given()
                 .header("Authorization", "Bearer " + token)
                 .when()
@@ -40,6 +42,4 @@ public class ActivityIntegrationTest extends BaseIntegrationTest{
                 .statusCode(200)
                 .body("$", instanceOf(java.util.List.class));
     }
-
 }
-
