@@ -38,24 +38,6 @@ jobs:
       - name: Start Docker Compose
         run: |
           docker compose -f integration-tests/docker-compose.yml up -d
-
-      # --------------------------------------------------
-      # HARD WAIT for infrastructure
-      # --------------------------------------------------
-      - name: Wait for Kafka
-        run: |
-          for i in {1..30}; do
-            if docker compose -f integration-tests/docker-compose.yml ps kafka | grep -q "healthy"; then
-              echo "Kafka is healthy"
-              exit 0
-            fi
-            echo "Waiting for Kafka..."
-            sleep 10
-          done
-          echo "Kafka failed to start"
-          docker compose -f integration-tests/docker-compose.yml logs kafka zookeeper
-          exit 1
-
       # --------------------------------------------------
       # Wait for API Gateway PORT (not just actuator)
       # --------------------------------------------------
