@@ -18,8 +18,8 @@ public class UserIntegrationTest extends BaseIntegrationTest {
     void shouldCreateUser() {
         String payload = """
                           {
-                            "name": "aaaaaa",
-                            "email": "aaaaa.sharma@example.com",
+                            "name": "aaabbbb",
+                            "email": "aaaabbbb.sharma@example.com",
                             "address": "123 Main Street, Apt 22",
                             "dateOfBirth": "2000-09-09",
                             "weight": 60.5,
