@@ -10,7 +10,7 @@ public class AuthIntegrationTest {
 
   @BeforeAll
   static void setUp() {
-    RestAssured.baseURI = System.getenv().getOrDefault("API_GATEWAY_URL", "http://localhost:4004");
+    RestAssured.baseURI = System.getenv().getOrDefault("API_GATEWAY_URL", "http://api-gateway:4004");
   }
 
 
