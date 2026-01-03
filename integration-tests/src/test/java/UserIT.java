@@ -16,7 +16,7 @@ public class UserIT extends BaseIntegrationTest {
           "address": "123 Main Street",
           "dateOfBirth": "2000-09-09",
           "weight": 65.0,
-          "height": 1.70,
+          "height": 1.40,
           "gender": "FEMALE",
           "fitnessGoal": "LOSE_WEIGHT",
           "dailyStepGoal": 8000,
