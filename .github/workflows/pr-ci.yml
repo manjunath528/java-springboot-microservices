@@ -7,8 +7,9 @@ on:
 
 jobs:
   integration-tests:
-    name: Integration Tests
     runs-on: ubuntu-latest
+    timeout-minutes: 30
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -20,43 +21,70 @@ jobs:
           java-version: '21'
           cache: maven
 
-      # ✅ Environment variable for RestAssured
+      # --------------------------------------------------
+      # Environment for integration tests
+      # --------------------------------------------------
       - name: Set environment variables
         run: |
           echo "API_GATEWAY_URL=http://localhost:4004" >> $GITHUB_ENV
 
-      # Optional debug (safe to remove later)
       - name: Debug environment variables
         run: |
           echo "API_GATEWAY_URL=$API_GATEWAY_URL"
 
-      # ✅ Start all services
-      - name: Start Docker Compose (integration environment)
+      # --------------------------------------------------
+      # Start integration environment
+      # --------------------------------------------------
+      - name: Start Docker Compose
         run: |
           docker compose -f integration-tests/docker-compose.yml up -d
 
-      # ✅ Wait until API Gateway is reachable
+      # --------------------------------------------------
+      # HARD WAIT for infrastructure
+      # --------------------------------------------------
+      - name: Wait for Kafka
+        run: |
+          for i in {1..30}; do
+            if docker compose -f integration-tests/docker-compose.yml ps kafka | grep -q "healthy"; then
+              echo "Kafka is healthy"
+              exit 0
+            fi
+            echo "Waiting for Kafka..."
+            sleep 10
+          done
+          echo "Kafka failed to start"
+          docker compose -f integration-tests/docker-compose.yml logs kafka zookeeper
+          exit 1
+
+      # --------------------------------------------------
+      # Wait for API Gateway PORT (not just actuator)
+      # --------------------------------------------------
       - name: Wait for API Gateway
         run: |
           for i in {1..30}; do
-            if curl -s http://localhost:4004/actuator/health | grep -q "UP"; then
+            if curl -sf http://localhost:4004/actuator/health > /dev/null; then
               echo "API Gateway is UP"
               exit 0
             fi
             echo "Waiting for API Gateway..."
             sleep 10
           done
+
           echo "API Gateway failed to start"
           docker compose -f integration-tests/docker-compose.yml ps
           docker compose -f integration-tests/docker-compose.yml logs
           exit 1
 
-      # ✅ Run integration tests
+      # --------------------------------------------------
+      # Run Integration Tests
+      # --------------------------------------------------
       - name: Run integration tests
         run: |
-          mvn test -pl integration-tests -am
+          mvn -B test -pl integration-tests -am
 
-      # ✅ Always clean up
+      # --------------------------------------------------
+      # Always cleanup
+      # --------------------------------------------------
       - name: Stop Docker Compose
         if: always()
         run: |
