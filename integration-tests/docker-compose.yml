@@ -1,3 +1,5 @@
+version: "3.8"
+
 services:
 
   # =========================
@@ -210,6 +212,9 @@ services:
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       SPRING_SQL_INIT_MODE: always
 
+  # =========================
+  # API Gateway
+  # =========================
   api-gateway:
     image: bmanjunath1928/api-gateway:1.0.0
     platform: linux/amd64
@@ -221,5 +226,9 @@ services:
       - notification-service
     ports:
       - "4004:4004"
-    environment:
-      AUTH_SERVICE_URL: http://auth-service:4005
+    # No env URLs needed because application.yml already uses http://auth-service:4005 etc.
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:4004/actuator/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
