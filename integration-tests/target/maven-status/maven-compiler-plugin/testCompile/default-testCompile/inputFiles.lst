@@ -1,6 +1,5 @@
-/Users/manjunathreddy/Desktop/java-spring-microservices/integration-tests/src/test/java/ActivityIntegrationTest.java
-/Users/manjunathreddy/Desktop/java-spring-microservices/integration-tests/src/test/java/AnalyticsIntegrationTest.java
-/Users/manjunathreddy/Desktop/java-spring-microservices/integration-tests/src/test/java/AuthIntegrationTest.java
-/Users/manjunathreddy/Desktop/java-spring-microservices/integration-tests/src/test/java/BaseIntegrationTest.java
-/Users/manjunathreddy/Desktop/java-spring-microservices/integration-tests/src/test/java/NutritionIntegrationTest.java
-/Users/manjunathreddy/Desktop/java-spring-microservices/integration-tests/src/test/java/UserIntegrationTest.java
+/Users/manjunathreddy/Desktop/java-springboot-microservices/integration-tests/src/test/java/ActivityIT.java
+/Users/manjunathreddy/Desktop/java-springboot-microservices/integration-tests/src/test/java/AuthIT.java
+/Users/manjunathreddy/Desktop/java-springboot-microservices/integration-tests/src/test/java/BaseIntegrationTest.java
+/Users/manjunathreddy/Desktop/java-springboot-microservices/integration-tests/src/test/java/NutritionIT.java
+/Users/manjunathreddy/Desktop/java-springboot-microservices/integration-tests/src/test/java/UserIT.java
