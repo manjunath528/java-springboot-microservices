@@ -28,29 +28,23 @@ jobs:
       # Environment for integration tests
       # --------------------------------------------------
       - name: Set environment variables
-        run: |
-          echo "API_GATEWAY_URL=http://localhost:4004" >> $GITHUB_ENV
+        run: echo "API_GATEWAY_URL=http://localhost:4004" >> $GITHUB_ENV
 
       - name: Debug environment variables
-        run: |
-          echo "API_GATEWAY_URL=$API_GATEWAY_URL"
+        run: echo "API_GATEWAY_URL=$API_GATEWAY_URL"
 
       # --------------------------------------------------
-      # Start integration environment
+      # Start Docker Compose
       # --------------------------------------------------
       - name: Start Docker Compose
-        run: |
-          docker compose -f integration-tests/docker-compose.yml up -d
+        run: docker compose -f integration-tests/docker-compose.yml up -d
 
       # --------------------------------------------------
-      # Wait for API Gateway (with initial delay)
+      # Wait for API Gateway health (no fixed 60s sleep)
       # --------------------------------------------------
       - name: Wait for API Gateway
         run: |
-          echo "Waiting 60s before first health check..."
-          sleep 60
-
-          for i in {1..60}; do  # up to ~10 minutes
+          for i in {1..60}; do  # up to 10 minutes
             if curl -sf http://localhost:4004/actuator/health > /dev/null; then
               echo "API Gateway is UP"
               exit 0
@@ -58,23 +52,20 @@ jobs:
             echo "Waiting for API Gateway... attempt $i"
             sleep 10
           done
-
-          echo "API Gateway failed to start"
+          echo "ERROR: API Gateway failed to start"
           docker compose -f integration-tests/docker-compose.yml ps
           docker compose -f integration-tests/docker-compose.yml logs
           exit 1
 
       # --------------------------------------------------
-      # Run Integration Tests
+      # Run Integration Tests (Failsafe compatible)
       # --------------------------------------------------
       - name: Run integration tests
-        run: |
-          mvn -B test -pl integration-tests -am
+        run: mvn -B verify -pl integration-tests -am
 
       # --------------------------------------------------
       # Always cleanup
       # --------------------------------------------------
       - name: Stop Docker Compose
         if: always()
-        run: |
-          docker compose -f integration-tests/docker-compose.yml down -v
+        run: docker compose -f integration-tests/docker-compose.yml down -v
