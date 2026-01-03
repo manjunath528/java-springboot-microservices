@@ -11,6 +11,9 @@ jobs:
     timeout-minutes: 30
 
     steps:
+      # --------------------------------------------------
+      # Checkout & Java setup
+      # --------------------------------------------------
       - name: Checkout repository
         uses: actions/checkout@v4
 
@@ -38,17 +41,21 @@ jobs:
       - name: Start Docker Compose
         run: |
           docker compose -f integration-tests/docker-compose.yml up -d
+
       # --------------------------------------------------
-      # Wait for API Gateway PORT (not just actuator)
+      # Wait for API Gateway (with initial delay)
       # --------------------------------------------------
       - name: Wait for API Gateway
         run: |
-          for i in {1..30}; do
+          echo "Waiting 60s before first health check..."
+          sleep 60
+
+          for i in {1..60}; do  # up to ~10 minutes
             if curl -sf http://localhost:4004/actuator/health > /dev/null; then
               echo "API Gateway is UP"
               exit 0
             fi
-            echo "Waiting for API Gateway..."
+            echo "Waiting for API Gateway... attempt $i"
             sleep 10
           done
 
