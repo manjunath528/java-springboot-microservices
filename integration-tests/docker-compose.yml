@@ -1,4 +1,4 @@
-version: '3.9'
+version: "3.9"
 
 networks:
   integration-tests_internal:
@@ -158,7 +158,7 @@ services:
       user-db:
         condition: service_healthy
       billing-service:
-        condition: service_started
+        condition: service_healthy
       kafka:
         condition: service_started
     ports:
@@ -239,19 +239,18 @@ services:
     image: bmanjunath1928/api-gateway:1.0.0
     depends_on:
       auth-service:
-        condition: service_started
+        condition: service_healthy
       user-service:
-        condition: service_started
+        condition: service_healthy
       workout-service:
-        condition: service_started
+        condition: service_healthy
       nutrition-service:
-        condition: service_started
+        condition: service_healthy
       notification-service:
-        condition: service_started
+        condition: service_healthy
     ports:
       - "4004:4004"
     environment:
-      # Define internal URLs for API Gateway to resolve in Docker
       AUTH_SERVICE_URL: http://auth-service:4005
       USER_SERVICE_URL: http://user-service:4000
       WORKOUT_SERVICE_URL: http://workout-service:4006

@@ -1,4 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: UserIT
 -------------------------------------------------------------------------------
-Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 15.70 s -- in UserIT
+Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 24.36 s -- in UserIT
