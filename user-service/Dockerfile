@@ -9,12 +9,18 @@ COPY src ./src
 RUN mvn -B clean package -DskipTests
 
 # -------- Runtime Stage --------
-FROM gcr.io/distroless/java21-debian12
+FROM eclipse-temurin:21-jre-jammy
 WORKDIR /app
 
-COPY --from=builder /app/target/user-service-0.0.1-SNAPSHOT.jar app.jar
+# install curl
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
 
-USER nonroot
+COPY wait-for-billing.sh /wait-for-billing.sh
+RUN chmod +x /wait-for-billing.sh
+
+COPY --from=builder /app/target/user-service-0.0.1-SNAPSHOT.jar /app/user-service.jar
+
 EXPOSE 4000
 
-ENTRYPOINT ["java","-XX:MaxRAMPercentage=75.0","-XX:+UseContainerSupport","-jar","app.jar"]
+ENTRYPOINT ["/wait-for-billing.sh"]
+CMD ["http://billing-service:4001", "java", "-jar", "/app/user-service.jar"]

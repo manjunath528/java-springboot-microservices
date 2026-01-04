@@ -10,6 +10,7 @@ services:
   # Zookeeper & Kafka
   # =========================
   zookeeper:
+    platform: linux/amd64
     image: confluentinc/cp-zookeeper:7.6.0
     container_name: zookeeper
     environment:
@@ -19,6 +20,7 @@ services:
       - integration-tests_internal
 
   kafka:
+    platform: linux/amd64
     image: confluentinc/cp-kafka:7.6.0
     container_name: kafka
     depends_on:
@@ -39,6 +41,7 @@ services:
   # Databases
   # =========================
   auth-db:
+    platform: linux/amd64
     image: postgres:16
     environment:
       POSTGRES_DB: db
@@ -47,11 +50,13 @@ services:
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U admin_user -d db"]
       interval: 10s
+      timeout: 5s
       retries: 10
     networks:
       - integration-tests_internal
 
   user-db:
+    platform: linux/amd64
     image: postgres:16
     environment:
       POSTGRES_DB: db
@@ -60,11 +65,13 @@ services:
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U admin_user -d db"]
       interval: 10s
+      timeout: 5s
       retries: 10
     networks:
       - integration-tests_internal
 
   nutrition-db:
+    platform: linux/amd64
     image: postgres:16
     environment:
       POSTGRES_DB: db
@@ -73,11 +80,13 @@ services:
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U admin_user -d db"]
       interval: 10s
+      timeout: 5s
       retries: 10
     networks:
       - integration-tests_internal
 
   notification-db:
+    platform: linux/amd64
     image: postgres:16
     environment:
       POSTGRES_DB: db
@@ -86,11 +95,13 @@ services:
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U admin_user -d db"]
       interval: 10s
+      timeout: 5s
       retries: 10
     networks:
       - integration-tests_internal
 
   workout-db:
+    platform: linux/amd64
     image: postgres:16
     environment:
       POSTGRES_DB: db
@@ -99,11 +110,13 @@ services:
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U admin_user -d db"]
       interval: 10s
+      timeout: 5s
       retries: 10
     networks:
       - integration-tests_internal
 
   billing-db:
+    platform: linux/amd64
     image: postgres:16
     environment:
       POSTGRES_DB: db
@@ -112,6 +125,7 @@ services:
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U admin_user -d db"]
       interval: 10s
+      timeout: 5s
       retries: 10
     networks:
       - integration-tests_internal
@@ -120,6 +134,7 @@ services:
   # Core Services
   # =========================
   auth-service:
+    platform: linux/amd64
     image: bmanjunath1928/auth-service:1.0.0
     depends_on:
       auth-db:
@@ -133,10 +148,17 @@ services:
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
       SPRING_SQL_INIT_MODE: always
       JWT_SECRET: lA93KpGHGfs92kSiD8JvUeF7lK7Jt4uQmQ4Q5u9pFvQ=
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:4005/actuator/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 40s
     networks:
       - integration-tests_internal
 
   billing-service:
+    platform: linux/amd64
     image: bmanjunath1928/billing-service:1.0.0
     depends_on:
       billing-db:
@@ -149,15 +171,21 @@ services:
       SPRING_DATASOURCE_USERNAME: admin_user
       SPRING_DATASOURCE_PASSWORD: password
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.PostgreSQLDialect
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:4001/actuator/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 60s
     networks:
       - integration-tests_internal
 
   user-service:
+    platform: linux/amd64
     image: bmanjunath1928/user-service:1.0.0
     depends_on:
       user-db:
-        condition: service_healthy
-      billing-service:
         condition: service_healthy
       kafka:
         condition: service_started
@@ -167,15 +195,20 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://user-db:5432/db
       SPRING_DATASOURCE_USERNAME: admin_user
       SPRING_DATASOURCE_PASSWORD: password
-      SPRING_JPA_HIBERNATE_DDL_AUTO: update
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-      SPRING_SQL_INIT_MODE: always
       BILLING_SERVICE_ADDRESS: billing-service
       BILLING_SERVICE_GRPC_PORT: 9001
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f http://localhost:4000/actuator/health || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 40s
     networks:
       - integration-tests_internal
 
   workout-service:
+    platform: linux/amd64
     image: bmanjunath1928/workout-service:1.0.0
     depends_on:
       workout-db:
@@ -191,10 +224,17 @@ services:
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       SPRING_SQL_INIT_MODE: always
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:4006/actuator/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 40s
     networks:
       - integration-tests_internal
 
   nutrition-service:
+    platform: linux/amd64
     image: bmanjunath1928/nutrition-service:1.0.0
     depends_on:
       nutrition-db:
@@ -210,10 +250,17 @@ services:
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       SPRING_SQL_INIT_MODE: always
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:4009/actuator/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 40s
     networks:
       - integration-tests_internal
 
   notification-service:
+    platform: linux/amd64
     image: bmanjunath1928/notification-service:1.0.0
     depends_on:
       notification-db:
@@ -229,6 +276,12 @@ services:
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       SPRING_SQL_INIT_MODE: always
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:4010/actuator/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 40s
     networks:
       - integration-tests_internal
 
@@ -236,18 +289,8 @@ services:
   # API Gateway
   # =========================
   api-gateway:
+    platform: linux/amd64
     image: bmanjunath1928/api-gateway:1.0.0
-    depends_on:
-      auth-service:
-        condition: service_healthy
-      user-service:
-        condition: service_healthy
-      workout-service:
-        condition: service_healthy
-      nutrition-service:
-        condition: service_healthy
-      notification-service:
-        condition: service_healthy
     ports:
       - "4004:4004"
     environment:
@@ -256,10 +299,12 @@ services:
       WORKOUT_SERVICE_URL: http://workout-service:4006
       NUTRITION_SERVICE_URL: http://nutrition-service:4009
       NOTIFICATION_SERVICE_URL: http://notification-service:4010
+    entrypoint: [ "/wait-for-services.sh", "http://auth-service:4005", "http://user-service:4000", "http://workout-service:4006", "http://nutrition-service:4009", "http://notification-service:4010" ]
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:4004/actuator/health || exit 1"]
+      test: [ "CMD-SHELL", "curl -f http://localhost:4004/actuator/health || exit 1" ]
       interval: 10s
       timeout: 5s
-      retries: 20
+      retries: 30
+      start_period: 40s
     networks:
       - integration-tests_internal

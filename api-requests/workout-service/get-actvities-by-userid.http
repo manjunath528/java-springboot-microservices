@@ -1,1 +1,1 @@
-GET http://localhost:4010/actuator/health
+GET http://billing-service:4001/actuator/health
