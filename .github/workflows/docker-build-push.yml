@@ -25,47 +25,47 @@ jobs:
       # -------- api-gateway --------
       - name: Build & push api-gateway
         run: |
-          docker build -t bmanjunath1928/api-gateway:${TAG} api-gateway
-          docker push bmanjunath1928/api-gateway:${TAG}
+          docker build -t bmanjunath1928/prod-api-gateway:${TAG} api-gateway
+          docker push bmanjunath1928/prod-api-gateway:${TAG}
 
       # -------- user-service --------
       - name: Build & push user-service
         run: |
-          docker build -t bmanjunath1928/user-service:${TAG} user-service
-          docker push bmanjunath1928/user-service:${TAG}
+          docker build -t bmanjunath1928/prod-user-service:${TAG} user-service
+          docker push bmanjunath1928/prod-user-service:${TAG}
 
       # -------- auth-service --------
       - name: Build & push auth-service
         run: |
-          docker build -t bmanjunath1928/auth-service:${TAG} auth-service
-          docker push bmanjunath1928/auth-service:${TAG}
+          docker build -t bmanjunath1928/prod-auth-service:${TAG} auth-service
+          docker push bmanjunath1928/prod-auth-service:${TAG}
 
       # -------- billing-service --------
       - name: Build & push billing-service
         run: |
-          docker build -t bmanjunath1928/billing-service:${TAG} billing-service
-          docker push bmanjunath1928/billing-service:${TAG}
+          docker build -t bmanjunath1928/prod-billing-service:${TAG} billing-service
+          docker push bmanjunath1928/prod-billing-service:${TAG}
 
       # -------- notification-service --------
       - name: Build & push notification-service
         run: |
-          docker build -t bmanjunath1928/notification-service:${TAG} notification-service
-          docker push bmanjunath1928/notification-service:${TAG}
+          docker build -t bmanjunath1928/prod-notification-service:${TAG} notification-service
+          docker push bmanjunath1928/prod-notification-service:${TAG}
 
       # -------- nutrition-service --------
       - name: Build & push nutrition-service
         run: |
-          docker build -t bmanjunath1928/nutrition-service:${TAG} nutrition-service
-          docker push bmanjunath1928/nutrition-service:${TAG}
+          docker build -t bmanjunath1928/prod-nutrition-service:${TAG} nutrition-service
+          docker push bmanjunath1928/prod-nutrition-service:${TAG}
 
       # -------- workout-service --------
       - name: Build & push workout-service
         run: |
-          docker build -t bmanjunath1928/workout-service:${TAG} workout-service
-          docker push bmanjunath1928/workout-service:${TAG}
+          docker build -t bmanjunath1928/prod-workout-service:${TAG} workout-service
+          docker push bmanjunath1928/prod-workout-service:${TAG}
 
       # -------- analytics-service --------
       - name: Build & push analytics-service
         run: |
-          docker build -t bmanjunath1928/analytics-service:${TAG} analytics-service
-          docker push bmanjunath1928/analytics-service:${TAG}
+          docker build -t bmanjunath1928/prod-analytics-service:${TAG} analytics-service
+          docker push bmanjunath1928/prod-analytics-service:${TAG}
