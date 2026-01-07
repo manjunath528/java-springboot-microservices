@@ -6,7 +6,7 @@ This repository contains a set of **Java Spring Boot microservices** integrated 
 
 ## 📦 Project Structure
 
-'''
+```plaintext
 
 java-springboot-microservices/
 ├── .github/                       # GitHub Actions workflows
@@ -71,3 +71,5 @@ java-springboot-microservices/
     ├── src/
     ├── Dockerfile
     └── pom.xml
+
+```
