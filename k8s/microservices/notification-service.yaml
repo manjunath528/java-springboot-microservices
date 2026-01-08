@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: notification-service
-          image: bmanjunath1928/notification-service:latest
+          image: bmanjunath1928/prod-notification-service:6f317b9cc594305dd22804ff8037d7fc44ba5037
           ports:
             - containerPort: 4010   # REST API port
           env:

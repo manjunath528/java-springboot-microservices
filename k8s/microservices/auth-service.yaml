@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: auth-service
-          image: bmanjunath1928/auth-service:latest
+          image: bmanjunath1928/prod-auth-service:6f317b9cc594305dd22804ff8037d7fc44ba5037
           ports:
             - containerPort: 4005   # REST API port
           env:
