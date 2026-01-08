@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: nutrition-service
-          image: bmanjunath1928/nutrition-service:latest
+          image: bmanjunath1928/prod-nutrition-service:6f317b9cc594305dd22804ff8037d7fc44ba5037
           ports:
             - containerPort: 4009   # REST API port
           env:

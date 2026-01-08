@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: workout-service
-          image: bmanjunath1928/workout-service:latest
+          image: bmanjunath1928/prod-workout-service:6f317b9cc594305dd22804ff8037d7fc44ba5037
           ports:
             - containerPort: 4006   # REST API port
           env:
