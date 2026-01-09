@@ -1,4 +1,4 @@
-# 🌐 Java Spring Boot Microservices – End-to-End DevOps Project
+# 🌐 Java Spring Boot Microservices – End-to-End Micoroserives and DevOps Project
 
 This project is a **real-world, production-style microservices platform** built using **Java Spring Boot** and deployed using a complete **DevOps CI/CD pipeline**.
 
@@ -313,3 +313,4 @@ New version goes live
 
 ### Manjunath Reddy
 #### Java | Spring Boot | Docker | Kubernetes | DevOps
+
