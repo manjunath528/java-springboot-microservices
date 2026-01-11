@@ -67,6 +67,6 @@ jobs:
 
       - name: Build & push ai-service
         run: |
-          docker build -t bmanjunath1928/prod-ai-service:${TAG} ai-service
-          docker push bmanjunath1928/prod-ai-service:${TAG}
+          docker build -t bmanjunath1928/prod-ai-agent-service:${TAG} ai-agent-service
+          docker push bmanjunath1928/prod-ai-agent-service:${TAG}
       
