@@ -11,6 +11,11 @@ It demonstrates how modern backend systems are:
 
 This repository is intentionally structured to reflect **industry-grade practices**, not a demo or toy setup.
 
+## 📦 High Level Architecture
+This is the high level system design diagram:
+
+![Image](https://github.com/user-attachments/assets/852940d1-9b83-4090-bf78-97c3f26d1e8a)
+
 ---
 
 ## 🎯 Purpose of This Project
@@ -313,4 +318,5 @@ New version goes live
 
 ### Manjunath Reddy
 #### Java | Spring Boot | Docker | Kubernetes | DevOps
+
 
