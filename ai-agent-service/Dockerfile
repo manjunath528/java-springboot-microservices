@@ -14,7 +14,7 @@ RUN mvn -B clean package -DskipTests
 FROM gcr.io/distroless/java21-debian12
 WORKDIR /app
 
-COPY --from=builder /app/target/ai-service-0.0.1-SNAPSHOT.jar app.jar
+COPY --from=builder /app/target/ai-agent-service-0.0.1-SNAPSHOT.jar app.jar
 
 USER nonroot
 EXPOSE 4012
