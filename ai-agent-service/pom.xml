@@ -10,10 +10,10 @@
     <relativePath/> <!-- lookup parent from repository -->
   </parent>
   <groupId>com.pm</groupId>
-  <artifactId>ai-service</artifactId>
+  <artifactId>ai-agent-service</artifactId>
   <version>0.0.1-SNAPSHOT</version>
-  <name>ai-service</name>
-  <description>ai-service</description>
+  <name>ai-agent-service</name>
+  <description>ai-agent-service</description>
   <url/>
   <licenses>
     <license/>

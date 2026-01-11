@@ -1,4 +1,4 @@
-package com.pm.aiservice.kafka;
+package com.pm.aiagent.kafka;
 import activity.events.ActivityEvent;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.slf4j.Logger;
@@ -14,7 +14,7 @@ public class KafkaConsumer {
   private static final Logger log = LoggerFactory.getLogger(
           KafkaConsumer.class);
 
-  @KafkaListener(topics = "activity", groupId = "analytics-service")
+  @KafkaListener(topics = "activity", groupId = "ai-agent-service")
   public void consumeActivityEvent(byte[] event) {
     try {
       ActivityEvent userEvent = ActivityEvent.parseFrom(event);
@@ -30,11 +30,11 @@ public class KafkaConsumer {
     }
   }
 
-  @KafkaListener(topics = "user", groupId = "analytics-service")
+  @KafkaListener(topics = "user", groupId = "ai-agent-service")
   public void consumeUserEvent(byte[] event) {
     try {
       UserEvent userEvent = UserEvent.parseFrom(event);
-      // ... perform any business related to analytics here
+      // ... perform any business related to agents here
 
       log.info("Received User Event: [UserId={},User Name={}, Event Type={}, User Email={}]",
               userEvent.getUserId(),
@@ -46,11 +46,11 @@ public class KafkaConsumer {
     }
   }
 
-  @KafkaListener(topics = "nutrition", groupId = "analytics-service")
+  @KafkaListener(topics = "nutrition", groupId = "ai-agent-service")
   public void consumeNutritionEvent(byte[] event) {
     try {
       NutritionEvent nutritionEvent = NutritionEvent.parseFrom(event);
-      // ... perform any business related to analytics here
+      // ... perform any business related to agents here
 
       log.info("Received Nutrition Event: [Id={},UserId={}, Event Type={}, Calories={}]",
               nutritionEvent.getId(),

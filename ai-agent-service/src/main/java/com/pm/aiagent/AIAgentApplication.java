@@ -1,13 +1,13 @@
-package com.pm.aiservice;
+package com.pm.aiagent;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class AIServiceApplication {
+public class AIAgentApplication {
 
   public static void main(String[] args) {
-    SpringApplication.run(AIServiceApplication.class, args);
+    SpringApplication.run(AIAgentApplication.class, args);
   }
 
 }
