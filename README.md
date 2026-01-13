@@ -307,7 +307,7 @@ New version goes live
 ## 🧹 Git Hygiene
 
 ### Ignored files:
-- actions-runner/
+- actions-runner
 - node binaries
 - large archives
 - secrets
@@ -318,6 +318,7 @@ New version goes live
 
 ### Manjunath Reddy
 #### Java | Spring Boot | Docker | Kubernetes | DevOps
+
 
 
 
