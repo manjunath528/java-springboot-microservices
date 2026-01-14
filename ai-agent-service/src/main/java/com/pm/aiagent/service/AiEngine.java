@@ -1,4 +1,5 @@
 package com.pm.aiagent.service;
+
 import activity.events.ActivityEvent;
 import nutrition.events.NutritionEvent;
 import users.events.UserEvent;
@@ -8,29 +9,49 @@ import org.springframework.stereotype.Service;
 @Service
 public class AiEngine {
 
+    private final PromptBuilder promptBuilder;
+    private final LlmClient llmClient;
+
+    public AiEngine(PromptBuilder promptBuilder, LlmClient llmClient) {
+        this.promptBuilder = promptBuilder;
+        this.llmClient = llmClient;
+    }
+
     public AiResponse processActivity(ActivityEvent activity, UserEvent user) {
-        String message;
-        String type = "WORKOUT";
+        try {
+            String prompt = promptBuilder.buildActivityPrompt(activity, user);
+            String aiText = llmClient.generateResponse(prompt);
 
-        if (activity.getCaloriesBurned() < 100) {
-            message = "Try increasing your workout intensity today!";
-        } else {
-            message = "Great job on your workout!";
+            return new AiResponse(
+                    user.getUserId(),
+                    aiText,
+                    "WORKOUT_AI"
+            );
+        } catch (Exception e) {
+            return new AiResponse(
+                    user.getUserId(),
+                    "Keep going! Consistency is key.",
+                    "FALLBACK"
+            );
         }
-
-        return new AiResponse(user.getUserId(), message, type);
     }
 
     public AiResponse processNutrition(NutritionEvent nutrition, UserEvent user) {
-        String message;
-        String type = "NUTRITION";
+        try {
+            String prompt = promptBuilder.buildNutritionPrompt(nutrition, user);
+            String aiText = llmClient.generateResponse(prompt);
 
-        if (nutrition.getCalories() > 800) {
-            message = "Consider a lighter meal for balanced nutrition.";
-        } else {
-            message = "Your meal is on track!";
+            return new AiResponse(
+                    user.getUserId(),
+                    aiText,
+                    "NUTRITION_AI"
+            );
+        } catch (Exception e) {
+            return new AiResponse(
+                    user.getUserId(),
+                    "Try maintaining a balanced diet today.",
+                    "FALLBACK"
+            );
         }
-
-        return new AiResponse(user.getUserId(), message, type);
     }
 }
