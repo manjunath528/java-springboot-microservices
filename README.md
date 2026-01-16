@@ -303,6 +303,14 @@ Rolling updates replace pods
 New version goes live
 
 ```
+```
+
+
+Workout Service ─┐
+Nutrition Service ├──▶ Kafka Topics ───▶ AI Agent Service ───▶ AI Insights Topic
+User Service     ─┘
+
+```
 
 ## 🧹 Git Hygiene
 
@@ -318,6 +326,7 @@ New version goes live
 
 ### Manjunath Reddy
 #### Java | Spring Boot | Docker | Kubernetes | DevOps
+
 
 
 
