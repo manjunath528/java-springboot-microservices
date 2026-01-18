@@ -59,6 +59,7 @@ Each microservice is:
 | nutrition-service | Nutrition data |
 | workout-service | Workout tracking |
 | analytics-service | Reporting & analytics |
+| ai-agent-service | Introduction to AI Agents |
 
 ---
 
@@ -326,6 +327,7 @@ User Service     ─┘
 
 ### Manjunath Reddy
 #### Java | Spring Boot | Docker | Kubernetes | DevOps
+
 
 
 
