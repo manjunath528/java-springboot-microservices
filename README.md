@@ -106,6 +106,10 @@ java-springboot-microservices/
 │   ├── src/
 │   ├── Dockerfile
 │   └── pom.xml
+├── ai-agent-service/
+│   ├── src/
+│   ├── Dockerfile
+│   └── pom.xml
 ├── user-service/
 │   ├── src/
 │   ├── Dockerfile
@@ -327,6 +331,7 @@ User Service     ─┘
 
 ### Manjunath Reddy
 #### Java | Spring Boot | Docker | Kubernetes | DevOps
+
 
 
 
