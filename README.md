@@ -284,6 +284,8 @@ Sensitive data is never committed to Git.
 - Minikube
 - kubectl
 - Helm
+- OpenAI
+- Maven
 
 ### Start Environment
 ```
@@ -331,6 +333,7 @@ User Service     ─┘
 
 ### Manjunath Reddy
 #### Java | Spring Boot | Docker | Kubernetes | DevOps
+
 
 
 
