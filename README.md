@@ -32,6 +32,7 @@ The goal of this project is to:
 This project answers the question:
 
 > *“How does real production code move from GitHub → Docker → Kubernetes automatically?”*
+> *“How does microservices communicate with each other based on requirement?”*
 
 ---
 
@@ -333,6 +334,7 @@ User Service     ─┘
 
 ### Manjunath Reddy
 #### Java | Spring Boot | Docker | Kubernetes | DevOps
+
 
 
 
