@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ai-agent-service
+  namespace: microservices
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ai-agent-service
+  template:
+    metadata:
+      labels:
+        app: ai-agent-service
+    spec:
+      containers:
+        - name: ai-agent-service
+          image: bmanjunath1928/prod-ai-agent-service:df2ec8c976dfee8bef9efc84b17994e254b45412
+          ports:
+            - containerPort: 4012  # REST API port
+          env:
+            - name: SPRING_KAFKA_BOOTSTRAP_SERVERS
+              value: kafka:9092
+            - name: SPRING_SQL_INIT_MODE
+              value: always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ai-agent-service
+  namespace: microservices
+spec:
+  selector:
+    app: ai-agent-service
+  ports:
+    - name: http
+      protocol: TCP
+      port: 4002
+      targetPort: 4002
+  type: ClusterIP
