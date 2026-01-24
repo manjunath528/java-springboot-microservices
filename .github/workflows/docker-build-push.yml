@@ -69,4 +69,9 @@ jobs:
         run: |
           docker build -t bmanjunath1928/prod-ai-agent-service:${TAG} ai-agent-service
           docker push bmanjunath1928/prod-ai-agent-service:${TAG}
+
+      - name: Build & push goal-service
+        run: |
+          docker build -t bmanjunath1928/prod-goal-service:${TAG} goal-service
+          docker push bmanjunath1928/prod-goal-service:${TAG}
       
