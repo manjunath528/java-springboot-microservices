@@ -252,7 +252,7 @@ helm install user-db bitnami/postgresql \
 
 ### Kafka is used for:
 - Asynchronous messaging
-- Event propagation
+- Event propagation (Eventually Consistency)
 - Loose service coupling
 - Examples:
 ```
@@ -334,6 +334,7 @@ User Service     ─┘
 
 ### Manjunath Reddy
 #### Java | Spring Boot | Docker | Kubernetes | DevOps
+
 
 
 
