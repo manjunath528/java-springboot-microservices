@@ -2,56 +2,43 @@ package com.pm.aiagent.service;
 
 import activity.events.ActivityEvent;
 import nutrition.events.NutritionEvent;
-import users.events.UserEvent;
-import com.pm.aiagent.model.AiResponse;
+import com.pm.aiagent.model.UserContext;
 import org.springframework.stereotype.Service;
 
 @Service
 public class AiEngine {
 
-    private final PromptBuilder promptBuilder;
     private final LlmClient llmClient;
 
-    public AiEngine(PromptBuilder promptBuilder, LlmClient llmClient) {
-        this.promptBuilder = promptBuilder;
+    public AiEngine(LlmClient llmClient) {
         this.llmClient = llmClient;
     }
 
-    public AiResponse processActivity(ActivityEvent activity, UserEvent user) {
-        try {
-            String prompt = promptBuilder.buildActivityPrompt(activity, user);
-            String aiText = llmClient.generateResponse(prompt);
+    public String coachForActivity(ActivityEvent a, UserContext u) throws Exception {
+        String prompt = """
+        User: %s (%s)
+        New activity event:
+        - type: %s
+        - durationMinutes: %d
+        - caloriesBurned: %d
 
-            return new AiResponse(
-                    user.getUserId(),
-                    aiText,
-                    "WORKOUT_AI"
-            );
-        } catch (Exception e) {
-            return new AiResponse(
-                    user.getUserId(),
-                    "Keep going! Consistency is key.",
-                    "FALLBACK"
-            );
-        }
+        Give one short actionable coaching message.
+        """.formatted(u.name(), u.userId(), a.getActivityType(), a.getDurationMinutes(), a.getCaloriesBurned());
+
+        return llmClient.generateCoachMessage(prompt);
     }
 
-    public AiResponse processNutrition(NutritionEvent nutrition, UserEvent user) {
-        try {
-            String prompt = promptBuilder.buildNutritionPrompt(nutrition, user);
-            String aiText = llmClient.generateResponse(prompt);
+    public String coachForNutrition(NutritionEvent n, UserContext u) throws Exception {
+        String prompt = """
+        User: %s (%s)
+        New nutrition event:
+        - mealType: %s
+        - calories: %d
+        - protein: %dg, carbs: %dg, fat: %dg
 
-            return new AiResponse(
-                    user.getUserId(),
-                    aiText,
-                    "NUTRITION_AI"
-            );
-        } catch (Exception e) {
-            return new AiResponse(
-                    user.getUserId(),
-                    "Try maintaining a balanced diet today.",
-                    "FALLBACK"
-            );
-        }
+        Give one short actionable nutrition coaching message.
+        """.formatted(u.name(), u.userId(), n.getMealType(), n.getCalories(), n.getProtein(), n.getCarbs(), n.getFat());
+
+        return llmClient.generateCoachMessage(prompt);
     }
 }

@@ -2,6 +2,10 @@ package com.pm.aiagent.kafka;
 
 import activity.events.ActivityEvent;
 import com.google.protobuf.InvalidProtocolBufferException;
+import com.pm.aiagent.model.AiRecommendation;
+import com.pm.aiagent.model.UserContext;
+import com.pm.aiagent.service.AiEngine;
+import com.pm.aiagent.store.UserContextStore;
 import nutrition.events.NutritionEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,105 +13,102 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 import users.events.UserEvent;
 
+import java.time.Instant;
+
 @Service
 public class KafkaConsumer {
 
   private static final Logger log = LoggerFactory.getLogger(KafkaConsumer.class);
 
-  /**
-   * Consume activity events from Kafka and process them.
-   */
-  @KafkaListener(topics = "activity", groupId = "ai-agent-service")
-  public void consumeActivityEvent(byte[] event) {
-    try {
-      ActivityEvent activityEvent = ActivityEvent.parseFrom(event);
+  private final UserContextStore userStore;
+  private final AiEngine aiEngine;
+  private final AiRecommendationProducer producer;
 
-      log.info("Received Activity Event: [ActivityId={}, UserId={}, EventType={}, ActivityType={}, Duration={}, Calories={}]",
-              activityEvent.getActivityId(),
-              activityEvent.getUserId(),
-              activityEvent.getEventType(),
-              activityEvent.getActivityType(),
-              activityEvent.getDurationMinutes(),
-              activityEvent.getCaloriesBurned());
-
-      // Build a dummy UserEvent for demonstration
-      UserEvent dummyUser = UserEvent.newBuilder()
-              .setUserId(activityEvent.getUserId())
-              .setName("Unknown")
-              .setEmail("unknown@example.com")
-              .setEventType("ACTIVITY_EVENT")
-              .build();
-
-      // Call your AI processing method (placeholder)
-      processActivityEvent(activityEvent, dummyUser);
-
-    } catch (InvalidProtocolBufferException e) {
-      log.error("Error deserializing ActivityEvent: {}", e.getMessage());
-    }
+  public KafkaConsumer(UserContextStore userStore, AiEngine aiEngine, AiRecommendationProducer producer) {
+    this.userStore = userStore;
+    this.aiEngine = aiEngine;
+    this.producer = producer;
   }
 
-  /**
-   * Consume user events from Kafka and process them.
-   */
   @KafkaListener(topics = "user", groupId = "ai-agent-service")
   public void consumeUserEvent(byte[] event) {
     try {
       UserEvent userEvent = UserEvent.parseFrom(event);
 
       log.info("Received User Event: [UserId={}, Name={}, Email={}, EventType={}]",
+              userEvent.getUserId(), userEvent.getName(), userEvent.getEmail(), userEvent.getEventType());
+
+      userStore.put(new UserContext(
               userEvent.getUserId(),
               userEvent.getName(),
-              userEvent.getEmail(),
-              userEvent.getEventType());
-
-      // Call AI processing for user events
-      processUserEvent(userEvent);
+              userEvent.getEmail()
+      ));
 
     } catch (InvalidProtocolBufferException e) {
       log.error("Error deserializing UserEvent: {}", e.getMessage());
     }
   }
 
-  /**
-   * Consume nutrition events from Kafka and process them.
-   */
-  @KafkaListener(topics = "nutrition", groupId = "ai-agent-service")
-  public void consumeNutritionEvent(byte[] event) {
+  @KafkaListener(topics = "activity", groupId = "ai-agent-service")
+  public void consumeActivityEvent(byte[] event) {
     try {
-      NutritionEvent nutritionEvent = NutritionEvent.parseFrom(event);
+      ActivityEvent a = ActivityEvent.parseFrom(event);
 
-      log.info("Received Nutrition Event: [Id={}, UserId={}, MealType={}, Calories={}, EventType={}]",
-              nutritionEvent.getId(),
-              nutritionEvent.getUserId(),
-              nutritionEvent.getMealType(),
-              nutritionEvent.getCalories(),
-              nutritionEvent.getEventType());
+      log.info("Received Activity Event: [ActivityId={}, UserId={}, EventType={}, ActivityType={}, Duration={}, Calories={}]",
+              a.getActivityId(), a.getUserId(), a.getEventType(), a.getActivityType(),
+              a.getDurationMinutes(), a.getCaloriesBurned());
 
-      // Call AI processing for nutrition events
-      processNutritionEvent(nutritionEvent);
+      UserContext user = userStore.get(a.getUserId())
+              .orElse(new UserContext(a.getUserId(), "Unknown", "unknown@example.com"));
+
+      String msg = aiEngine.coachForActivity(a, user);
+
+      AiRecommendation out = new AiRecommendation(
+              user.userId(),
+              "ACTIVITY",
+              msg,
+              "INFO",
+              Instant.now()
+      );
+
+      producer.publish(out);
+      log.info("Published AI recommendation for user {} to ai-recommendations", user.userId());
 
     } catch (InvalidProtocolBufferException e) {
-      log.error("Error deserializing NutritionEvent: {}", e.getMessage());
+      log.error("Error deserializing ActivityEvent: {}", e.getMessage());
+    } catch (Exception e) {
+      log.error("AI processing failed for ActivityEvent: {}", e.getMessage(), e);
     }
   }
 
-  // ================= AI Processing Placeholders =================
+  @KafkaListener(topics = "nutrition", groupId = "ai-agent-service")
+  public void consumeNutritionEvent(byte[] event) {
+    try {
+      NutritionEvent n = NutritionEvent.parseFrom(event);
 
-  private void processActivityEvent(ActivityEvent activity, UserEvent user) {
-    // TODO: Implement AI logic here
-    // e.g., recommend workout adjustments, detect anomalies, send alerts
-    log.info("AI processing ActivityEvent for user {}", user.getUserId());
-  }
+      log.info("Received Nutrition Event: [Id={}, UserId={}, MealType={}, Calories={}, EventType={}]",
+              n.getId(), n.getUserId(), n.getMealType(), n.getCalories(), n.getEventType());
 
-  private void processUserEvent(UserEvent user) {
-    // TODO: Implement AI logic for user data
-    // e.g., personalize nutrition/workout plans
-    log.info("AI processing UserEvent for user {}", user.getUserId());
-  }
+      UserContext user = userStore.get(n.getUserId())
+              .orElse(new UserContext(n.getUserId(), "Unknown", "unknown@example.com"));
 
-  private void processNutritionEvent(NutritionEvent nutrition) {
-    // TODO: Implement AI logic for nutrition data
-    // e.g., detect calorie imbalance, suggest diet changes
-    log.info("AI processing NutritionEvent for user {}", nutrition.getUserId());
+      String msg = aiEngine.coachForNutrition(n, user);
+
+      AiRecommendation out = new AiRecommendation(
+              user.userId(),
+              "NUTRITION",
+              msg,
+              n.getCalories() > 800 ? "WARNING" : "INFO",
+              Instant.now()
+      );
+
+      producer.publish(out);
+      log.info("Published AI recommendation for user {} to ai-recommendations", user.userId());
+
+    } catch (InvalidProtocolBufferException e) {
+      log.error("Error deserializing NutritionEvent: {}", e.getMessage());
+    } catch (Exception e) {
+      log.error("AI processing failed for NutritionEvent: {}", e.getMessage(), e);
+    }
   }
 }
