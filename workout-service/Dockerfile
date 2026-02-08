@@ -6,9 +6,9 @@ WORKDIR /app
 COPY pom.xml .
 RUN mvn -B dependency:go-offline
 
-# Copy source and build
+# Copy source and build (run tests)
 COPY src ./src
-RUN mvn -B clean package -DskipTests
+RUN mvn -B clean package
 
 # -------- Runtime Stage --------
 FROM gcr.io/distroless/java21-debian12
