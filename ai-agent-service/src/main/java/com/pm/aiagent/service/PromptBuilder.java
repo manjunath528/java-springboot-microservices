@@ -4,7 +4,6 @@ import activity.events.ActivityEvent;
 import nutrition.events.NutritionEvent;
 import org.springframework.stereotype.Service;
 import users.events.UserEvent;
-import org.springframework.stereotype.Component;
 
 @Service
 public class PromptBuilder {

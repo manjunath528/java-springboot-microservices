@@ -3,11 +3,17 @@ package com.pm.aiagent.service;
 import okhttp3.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.Locale;
 
 @Service
 public class LlmClient {
+
+    private static final Logger log = LoggerFactory.getLogger(LlmClient.class);
+    private static final MediaType JSON_MEDIA_TYPE = MediaType.parse("application/json");
 
     private final OkHttpClient client;
 
@@ -47,13 +53,16 @@ public class LlmClient {
 
         Request request = new Request.Builder()
                 .url("https://api.openai.com/v1/chat/completions")
-                .post(RequestBody.create(json, MediaType.parse("application/json")))
+                .post(RequestBody.create(json, JSON_MEDIA_TYPE))
                 .addHeader("Authorization", "Bearer " + apiKey)
                 .addHeader("Content-Type", "application/json")
                 .build();
 
         try (Response response = client.newCall(request).execute()) {
             if (response.body() == null) return "No response body from LLM.";
+            if (!response.isSuccessful()) {
+                log.warn("LLM request failed with status {}", response.code());
+            }
             String body = response.body().string();
 
             // Minimal extraction without adding json libs:
@@ -86,7 +95,8 @@ public class LlmClient {
 
     private static String fallback(String prompt) {
         // Simple fallback logic
-        if (prompt.toLowerCase().contains("calories") && prompt.toLowerCase().contains("nutrition")) {
+        String lowered = prompt.toLowerCase(Locale.ROOT);
+        if (lowered.contains("calories") && lowered.contains("nutrition")) {
             return "Try to balance your meal with more protein and fiber.";
         }
         return "Keep consistency today: a short workout + hydration goes a long way.";
