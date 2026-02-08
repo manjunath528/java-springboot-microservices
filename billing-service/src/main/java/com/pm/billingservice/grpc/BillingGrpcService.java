@@ -27,7 +27,8 @@ public class BillingGrpcService extends BillingServiceImplBase {
           BillingRequest billingRequest,
           StreamObserver<BillingResponse> responseObserver) {
 
-      log.info("createBillingAccount request received {}", billingRequest);
+      log.info("createBillingAccount request received for userId={}",
+              billingRequest.getUserId());
 
       try {
           // Save in DB
@@ -44,13 +45,15 @@ public class BillingGrpcService extends BillingServiceImplBase {
                   .setStatus(saved.getStatus())
                   .build();
 
-          log.info("Billing account created: {}", saved.getAccountId());
+          log.info("Billing account created for userId={} accountId={}",
+                  saved.getUserId(), saved.getAccountId());
 
           responseObserver.onNext(response);
           responseObserver.onCompleted();
 
       } catch (Exception e) {
-          log.error("Failed to create billing account", e);
+          log.error("Failed to create billing account for userId={}",
+                  billingRequest.getUserId(), e);
           responseObserver.onError(
                   Status.INTERNAL
                           .withDescription("Error creating billing account")
