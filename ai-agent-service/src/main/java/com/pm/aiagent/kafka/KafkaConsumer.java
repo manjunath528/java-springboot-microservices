@@ -45,7 +45,7 @@ public class KafkaConsumer {
       ));
 
     } catch (InvalidProtocolBufferException e) {
-      log.error("Error deserializing UserEvent: {}", e.getMessage());
+      log.error("Error deserializing UserEvent", e);
     }
   }
 
@@ -59,7 +59,7 @@ public class KafkaConsumer {
               a.getDurationMinutes(), a.getCaloriesBurned());
 
       UserContext user = userStore.get(a.getUserId())
-              .orElse(new UserContext(a.getUserId(), "Unknown", "unknown@example.com"));
+              .orElseGet(() -> new UserContext(a.getUserId(), "Unknown", "unknown@example.com"));
 
       String msg = aiEngine.coachForActivity(a, user);
 
@@ -75,7 +75,7 @@ public class KafkaConsumer {
       log.info("Published AI recommendation for user {} to ai-recommendations", user.userId());
 
     } catch (InvalidProtocolBufferException e) {
-      log.error("Error deserializing ActivityEvent: {}", e.getMessage());
+      log.error("Error deserializing ActivityEvent", e);
     } catch (Exception e) {
       log.error("AI processing failed for ActivityEvent: {}", e.getMessage(), e);
     }
@@ -90,7 +90,7 @@ public class KafkaConsumer {
               n.getId(), n.getUserId(), n.getMealType(), n.getCalories(), n.getEventType());
 
       UserContext user = userStore.get(n.getUserId())
-              .orElse(new UserContext(n.getUserId(), "Unknown", "unknown@example.com"));
+              .orElseGet(() -> new UserContext(n.getUserId(), "Unknown", "unknown@example.com"));
 
       String msg = aiEngine.coachForNutrition(n, user);
 
@@ -106,7 +106,7 @@ public class KafkaConsumer {
       log.info("Published AI recommendation for user {} to ai-recommendations", user.userId());
 
     } catch (InvalidProtocolBufferException e) {
-      log.error("Error deserializing NutritionEvent: {}", e.getMessage());
+      log.error("Error deserializing NutritionEvent", e);
     } catch (Exception e) {
       log.error("AI processing failed for NutritionEvent: {}", e.getMessage(), e);
     }
