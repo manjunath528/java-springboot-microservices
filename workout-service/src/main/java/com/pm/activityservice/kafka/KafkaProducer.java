@@ -32,8 +32,11 @@ public class KafkaProducer {
 
         try {
             kafkaTemplate.send("activity", event.toByteArray());
+            log.info("ActivityCreated event published for activityId={} userId={}",
+                    activity.getId(), activity.getUserId());
         } catch (Exception e) {
-            log.error("Error sending ActivityCreated event: {}", event);
+            log.error("Failed to publish ActivityCreated event for activityId={} userId={}",
+                    activity.getId(), activity.getUserId(), e);
         }
     }
 }
