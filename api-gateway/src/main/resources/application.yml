@@ -11,8 +11,6 @@ spring:
             - Path=/auth/**
           filters:
             - StripPrefix=1
-
-        # Route for /api/patients/** to patient-service
         - id: user-service-route
           uri: http://user-service:4000
           predicates:
@@ -45,7 +43,37 @@ spring:
             - StripPrefix=1
             - JwtValidation
 
-        # Route for /api/docs/patients to patient-service /v3/api-docs
+        - id: goal-service
+          uri: http://goal-service:4013
+          predicates:
+            - Path=/api/goals/**
+          filters:
+            - StripPrefix=1
+            - JwtValidation
+
+        - id: billing-service
+          uri: http://billing-service:4001
+          predicates:
+            - Path=/api/billing/**
+          filters:
+            - StripPrefix=1
+            - JwtValidation
+
+        - id: ai-agent-service
+          uri: http://ai-agent-service:4002
+          predicates:
+            - Path=/api/ai/**
+          filters:
+            - StripPrefix=1
+            - JwtValidation
+
+        - id: analytics-service
+          uri: http://analytics-service:4002
+          predicates:
+            - Path=/api/analytics/**
+          filters:
+            - StripPrefix=1
+            - JwtValidation
         - id: api-docs-user-route
           uri: http://user-service:4000
           predicates:
@@ -59,6 +87,55 @@ spring:
             - Path=/api-docs/auth
           filters:
             - RewritePath=/api-docs/auth,/v3/api-docs
+
+        - id: api-docs-workout-route
+          uri: http://workout-service:4006
+          predicates:
+            - Path=/api-docs/workout
+          filters:
+            - RewritePath=/api-docs/workout,/v3/api-docs
+
+        - id: api-docs-nutrition-route
+          uri: http://nutrition-service:4009
+          predicates:
+            - Path=/api-docs/nutrition
+          filters:
+            - RewritePath=/api-docs/nutrition,/v3/api-docs
+
+        - id: api-docs-notification-route
+          uri: http://notification-service:4010
+          predicates:
+            - Path=/api-docs/notifications
+          filters:
+            - RewritePath=/api-docs/notifications,/v3/api-docs
+
+        - id: api-docs-goal-route
+          uri: http://goal-service:4013
+          predicates:
+            - Path=/api-docs/goals
+          filters:
+            - RewritePath=/api-docs/goals,/v3/api-docs
+
+        - id: api-docs-billing-route
+          uri: http://billing-service:4001
+          predicates:
+            - Path=/api-docs/billing
+          filters:
+            - RewritePath=/api-docs/billing,/v3/api-docs
+
+        - id: api-docs-ai-agent-route
+          uri: http://ai-agent-service:4002
+          predicates:
+            - Path=/api-docs/ai
+          filters:
+            - RewritePath=/api-docs/ai,/v3/api-docs
+
+        - id: api-docs-analytics-route
+          uri: http://analytics-service:4002
+          predicates:
+            - Path=/api-docs/analytics
+          filters:
+            - RewritePath=/api-docs/analytics,/v3/api-docs
 management:
   endpoints:
     web:
