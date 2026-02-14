@@ -11,8 +11,6 @@ spring:
             - Path=/auth/**
           filters:
             - StripPrefix=1
-
-        # Route for /api/patients/** to patient-service
         - id: user-service-route
           uri: http://user-service:4000
           predicates:
@@ -76,8 +74,6 @@ spring:
           filters:
             - StripPrefix=1
             - JwtValidation
-
-        # Route for /api/docs/patients to patient-service /v3/api-docs
         - id: api-docs-user-route
           uri: http://user-service:4000
           predicates:
